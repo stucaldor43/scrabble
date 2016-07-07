@@ -2,3 +2,35 @@ body {
     background-color: teal;
     font-family: sans-serif;
 }
+
+.square {
+    display: inline-block;
+    width: 6.65%;
+    height: 40px;
+    border: thin solid black;
+    vertical-align: top;
+    text-align: center;
+    color: white;
+    font-size: 1.2em;
+    font-weight: 800;
+}
+
+.triple-word {
+    background-color: red;
+}
+
+.double-word {
+    background-color: pink;
+}
+
+.triple-letter {
+    background-color: purple;
+}
+
+.double-letter {
+    background-color: aqua;
+}
+
+.empty {
+    background-color: white;
+}
