@@ -1,5 +1,6 @@
 dist/css/**/*
 dist/js/**/*
+dist/tests/**/*
 ./node_modules
 src/css/**/*
 !src/css/**/*.scss
