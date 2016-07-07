@@ -1,7 +1,16 @@
 var gulp = require("gulp");
 var sass = require("gulp-sass");
 var babel = require("gulp-babel");
- 
+var browserify = require("browserify");
+var source = require("vinyl-source-stream");
+
+gulp.task("browserify", function() {
+    return browserify("dist/js/scrabble.js")
+      .bundle()
+      .pipe(source("bundle.js"))
+      .pipe(gulp.dest("dist/js"));
+});
+
 gulp.task("es6ify", function() {
     return gulp.src("src/js/*.js")
       .pipe(babel({
@@ -11,11 +20,11 @@ gulp.task("es6ify", function() {
 });
 
 gulp.task("es6ify-test", function() {
-    return gulp.src("src/js/tests/*.js")
+    return gulp.src("src/tests/*.js")
       .pipe(babel({
-        presets: ['es2015']
+        presets: ['es2015', 'react']
       }))
-      .pipe(gulp.dest("dist/js/tests"));
+      .pipe(gulp.dest("dist/tests"));
 });
 gulp.task("sassify", function() {
     return gulp.src("src/css/*.scss")
@@ -45,5 +54,6 @@ var watch3 = gulp.watch("src/**/*.css", ["css-port"]);
 watch3.on("change", notify);
 var watch4 = gulp.watch("src/**/*.map", ["map-port"]);
 watch4.on("change", notify);
-var watch5 = gulp.watch("src/js/tests/**/*.js", ["es6ify-test"]);
+var watch5 = gulp.watch("src/tests/**/*.js", ["es6ify-test"]);
 watch5.on("change", notify);
+var watch6 = gulp.watch("dist/js/**/*", ["browserify"]);
