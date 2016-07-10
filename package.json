@@ -25,7 +25,6 @@
     "react-addons-test-utils": "^15.1.0",
     "react-dom": "^15.1.0",
     "sinon": "^1.17.4",
-    "sortablejs": "^1.4.2",
     "vinyl-source-stream": "^1.1.0"
   },
   "dependencies": {}

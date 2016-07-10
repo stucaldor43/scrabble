@@ -105,16 +105,6 @@ export default React.createClass({
       this.dealInitialHands();
       this.setPlayerToGoFirst(); 
     },
-    configSortable(element) {
-      if (typeof element.id === "undefined") {
-        throw new Error("Sortable container is missing id");
-      }
-      let sortable = new Sortable(element, {
-         group: {name: "inter", pull: false, put: this.playerIds},
-         sort: false,
-         chosenClass: "sortable-chosen"
-      });
-    },
     render() {
       return (
         <div class="container-fluid">
