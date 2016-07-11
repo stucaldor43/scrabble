@@ -43,8 +43,15 @@ const Root = React.createClass({
       this.start();
       this.setState({players: this.players});
     },
-    addToRecentlyPlacedTiles(tile) {
-      this.recentlyPlacedTiles.push(tile);
+    addToRecentlyPlacedTiles(id) {
+      let tile = this.currentTurnPlayer.getTile(id);
+      if (tile) {
+        this.recentlyPlacedTiles.push(tile);
+      }
+    },
+    removeTile(id) {
+      this.currentTurnPlayer.removeTile(id);
+      this.setState({players: this.players});
     },
     addPlayers() {
       for (var i = 0; i < 4; i++) {

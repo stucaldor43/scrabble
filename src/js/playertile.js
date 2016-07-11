@@ -17,6 +17,8 @@ let tileSource = {
     }
     
     target.setContents(props.src);
+    props.root.addToRecentlyPlacedTiles(tileId);
+    props.root.removeTile(tileId);
   }
 };
 
