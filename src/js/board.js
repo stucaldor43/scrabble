@@ -3,11 +3,11 @@ import Cell from "./cell";
 
 export default React.createClass({
    render() {
-      const boardCells = this.props.cellClasses.map((rowClasses) => {
-          let cells = rowClasses.map((curr) => {
-            return <Cell classAttrName={curr}/>;    
+      const boardCells = this.props.cellClasses.map((rowClasses, rowIndex) => {
+          let cells = rowClasses.map((curr, colIndex) => {
+            return <Cell root={this.props.parent} row={rowIndex} col={colIndex} classAttrName={curr}/>;    
           });
-          return <div className="row"><div className="col-xs-12">{cells}</div></div>
+          return <div className="row"><div className="col-xs-12">{cells}</div></div>;
           
       });
       

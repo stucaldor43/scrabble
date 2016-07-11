@@ -17,6 +17,7 @@ let tileSource = {
     }
     
     target.setContents(props.src);
+    props.root.addToTileCellList(tileId, target);
     props.root.addToRecentlyPlacedTiles(tileId);
     props.root.removeTile(tileId);
   }

@@ -5,8 +5,8 @@ import PlayerHand from "./playerhand";
 import ScoreBoard from "./scoreboard";
 import Controls from "./controls";
 import Board from "./board";
-import HTML5Backend from "react-dnd-html5-backend"
-import { DragDropContext } from "react-dnd"
+import HTML5Backend from "react-dnd-html5-backend";
+import { DragDropContext } from "react-dnd";
 
 const boardLayout = [["WWW", "*", "*", "LL", "*", "*", "*",
 "WWW", "*", "*", "*", "LL", "*", "*", "WWW"], ["*", "WW", 
@@ -38,10 +38,47 @@ const Root = React.createClass({
       this.bag = new TileBag();
       this.bag.shuffle();
       this.players = [];
-      this.playerIds = ["player1", "player2", "player3", "player4"]
+      this.playerIds = ["player1", "player2", "player3", "player4"];
       this.recentlyPlacedTiles = [];
+      this.tileCellList = [];
+      this.cellRefs = new Array(15);
+      for (let i = 0; i < 15; i++) {
+        this.cellRefs[i] = new Array(15);
+      }
       this.start();
       this.setState({players: this.players});
+    },
+    addToTileCellList(tileId, cell) {
+      const tile = this.currentTurnPlayer.getTile(tileId);
+      this.tileCellList.push({tile: tile, cell: cell});
+    },
+    deleteFromTileCellList(tileId) {
+      this.tileCellList = this.tileCellList.filter((tileCell) => tileCell.tile.id !== tileId);
+    },
+    getCellFromTileCellList(tileId) {
+      const index = this.tileCellList.findIndex((tileCell) => tileCell.tile.id === tileId);
+      return (index >= 0 ? this.tileCellList[index].cell : null);
+    },
+    pass() {
+      if (this.recentlyPlacedTiles.length === 0) {
+        this.shiftCurrentTurnPlayer();
+      }
+    },
+    undo() {
+      if (this.recentlyPlacedTiles.length >= 1) {
+        const tile = this.recentlyPlacedTiles.pop();
+        this.currentTurnPlayer.addTile(tile);
+        this.setState({players: this.players});
+        const cell = this.getCellFromTileCellList(tile.id);
+        cell.removeContents();
+        this.deleteFromTileCellList(tile.id);
+      }
+    },
+    endTurn() {
+      
+    },
+    exchangeTiles() {
+      
     },
     addToRecentlyPlacedTiles(id) {
       let tile = this.currentTurnPlayer.getTile(id);
@@ -120,10 +157,10 @@ const Root = React.createClass({
       return (
         <div class="container-fluid">
           <ScoreBoard />
-          <Controls />
+          <Controls parent={this}/>
           <PlayerHand owner={this.players[1]} parent={this} id={this.playerIds[1]} tiles={this.players[1].getHand()}/>
           <PlayerHand owner={this.players[2]} parent={this} id={this.playerIds[2]} tiles={this.players[2].getHand()}/>
-          <Board cellClasses={this.createBoard()} />
+          <Board cellClasses={this.createBoard()} parent={this} />
           <PlayerHand owner={this.players[3]} parent={this} id={this.playerIds[3]} tiles={this.players[3].getHand()}/>
           <PlayerHand owner={this.players[0]} parent={this} id={this.playerIds[0]} tiles={this.players[0].getHand()}/>
         </div>

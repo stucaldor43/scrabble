@@ -29,6 +29,10 @@
       });
     };
     
+    Player.prototype.addTile = function(tile) {
+      this.hand.push(tile);
+    };
+    
     Player.prototype.drawToLimit = function(bag) {
       while(!bag.isEmpty() && this.hand.length < this.rackLimit) {
         this.hand.push(bag.draw());

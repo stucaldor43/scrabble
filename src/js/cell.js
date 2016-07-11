@@ -23,6 +23,10 @@ const Cell = React.createClass({
    getInitialState() {
      return {occupant: null};
    },
+   componentDidMount() {
+     const { row, col } = this.props;
+     this.props.root.cellRefs[row][col] = this;  
+   },
    setContents(src) {
      this.setState({occupant: <img src={src} />});   
    },
