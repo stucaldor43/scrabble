@@ -1,13 +1,19 @@
 import React from "react";
-
+import Cell from "./cell";
 
 export default React.createClass({
    render() {
-      return (
-        <div className="row">
-          <div className="col-xs-12">
-            {this.props.board} 
-          </div>
+      const boardCells = this.props.cellClasses.map((rowClasses) => {
+          let cells = rowClasses.map((curr) => {
+            return <Cell classAttrName={curr}/>;    
+          });
+          return <div className="row"><div className="col-xs-12">{cells}</div></div>
+          
+      });
+      
+      return(
+        <div>
+          {boardCells}
         </div>
       );
    } 

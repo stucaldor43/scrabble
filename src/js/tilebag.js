@@ -137,9 +137,13 @@ let tile_info_list = [{
     
     export default function TileBag() {
       this.tiles = [];
+      let idIndex = 0;
       for (const t of tile_info_list) {
           for (let i = 0; i < t.frequency; i++) {
-           this.tiles.push(Object.assign({}, t));
+           let tile = Object.assign({}, t);
+           tile.id = idIndex;
+           this.tiles.push(tile);
+           idIndex++;
           }
       }
       

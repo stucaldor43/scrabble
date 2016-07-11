@@ -5,7 +5,8 @@ import PlayerHand from "./playerhand";
 import ScoreBoard from "./scoreboard";
 import Controls from "./controls";
 import Board from "./board";
-import Sortable from "sortablejs";
+import HTML5Backend from "react-dnd-html5-backend"
+import { DragDropContext } from "react-dnd"
 
 const boardLayout = [["WWW", "*", "*", "LL", "*", "*", "*",
 "WWW", "*", "*", "*", "LL", "*", "*", "WWW"], ["*", "WW", 
@@ -29,7 +30,7 @@ const boardLayout = [["WWW", "*", "*", "LL", "*", "*", "*",
 "*", "LLL", "*", "*", "*", "WW", "*"], ["WWW", "*", "*", "LL", 
 "*", "*", "*", "WWW", "*", "*", "*", "LL", "*", "*", "WWW"]];
 
-export default React.createClass({
+const Root = React.createClass({
     getDefaultProps() {
       return {numberOfPlayers: 2};
     },
@@ -37,9 +38,13 @@ export default React.createClass({
       this.bag = new TileBag();
       this.bag.shuffle();
       this.players = [];
-      this.playerIds = ["player1", "player2", "player3", "player4"];
+      this.playerIds = ["player1", "player2", "player3", "player4"]
+      this.recentlyPlacedTiles = [];
       this.start();
       this.setState({players: this.players});
+    },
+    addToRecentlyPlacedTiles(tile) {
+      this.recentlyPlacedTiles.push(tile);
     },
     addPlayers() {
       for (var i = 0; i < 4; i++) {
@@ -64,37 +69,36 @@ export default React.createClass({
       }
     },
     componentDidMount() {
-      console.log(document.getElementById("game-container"));
+      
     },
     createBoard() {
       return boardLayout.map((currentRow, i) => {
         let boardTiles = currentRow.map((sym) => {
           return this.getCorrespondingJSXElement(sym);
         });
-        return <div className="row" ><div id={i} className="col-xs-12" 
-        ref={(c) => this.configSortable(c)}>{boardTiles}</div></div>;
+        return boardTiles;
       });
     },
     getCorrespondingJSXElement(symbols) {
       let element;
       switch(symbols) {
         case "WWW":
-              element = <div className="triple-word square">3W</div>;
+              element = "triple-word square";
               break;
         case "WW":
-              element = <div className="double-word square">2W</div>;
+              element = "double-word square";
               break;
         case "LL":
-              element = <div className="double-letter square">2L</div>;
+              element = "double-letter square";
               break;
         case "LLL":
-              element = <div className="triple-letter square">3L</div>;
+              element = "triple-letter square";
               break;
         case "F":
-              element = <div className="free square">Free</div>;
+              element = "free square";
               break;
         case "*":
-              element = <div className="empty square"></div>;
+              element = "empty square";
               break;
         default: throw new Error("Unrecognizable symbol detected");
       }
@@ -110,12 +114,14 @@ export default React.createClass({
         <div class="container-fluid">
           <ScoreBoard />
           <Controls />
-          <PlayerHand id={this.playerIds[1]} tiles={this.players[1].getHand()}/>
-          <PlayerHand id={this.playerIds[2]} tiles={this.players[2].getHand()}/>
-          <Board board={this.createBoard()} />
-          <PlayerHand id={this.playerIds[3]} tiles={this.players[3].getHand()}/>
-          <PlayerHand id={this.playerIds[0]} tiles={this.players[0].getHand()}/>
+          <PlayerHand owner={this.players[1]} parent={this} id={this.playerIds[1]} tiles={this.players[1].getHand()}/>
+          <PlayerHand owner={this.players[2]} parent={this} id={this.playerIds[2]} tiles={this.players[2].getHand()}/>
+          <Board cellClasses={this.createBoard()} />
+          <PlayerHand owner={this.players[3]} parent={this} id={this.playerIds[3]} tiles={this.players[3].getHand()}/>
+          <PlayerHand owner={this.players[0]} parent={this} id={this.playerIds[0]} tiles={this.players[0].getHand()}/>
         </div>
       );
     } 
 });
+
+export default DragDropContext(HTML5Backend)(Root)
