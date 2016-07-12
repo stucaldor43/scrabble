@@ -169,6 +169,11 @@ let tile_info_list = [{
       }
     };
     
+    TileBag.prototype.insert = function(newTiles) {
+      this.tiles.push(...newTiles);
+      this.shuffle();
+    };
+    
     TileBag.prototype.isEmpty = function() {
       return this.tiles.length === 0;
     };

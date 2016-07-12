@@ -39,3 +39,13 @@ body {
     background-color: white;
 }
 
+.exchange-candidate {
+    border: thick solid gold;
+}
+
+.dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

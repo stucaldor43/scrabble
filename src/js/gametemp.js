@@ -5,6 +5,7 @@ import PlayerHand from "./playerhand";
 import ScoreBoard from "./scoreboard";
 import Controls from "./controls";
 import Board from "./board";
+import ExchangeDialog from "./exchangedialog"
 import HTML5Backend from "react-dnd-html5-backend";
 import { DragDropContext } from "react-dnd";
 
@@ -33,6 +34,9 @@ const boardLayout = [["WWW", "*", "*", "LL", "*", "*", "*",
 const Root = React.createClass({
     getDefaultProps() {
       return {numberOfPlayers: 2};
+    },
+    getInitialState() {
+      return {isExchangeDialogOpen: false};
     },
     componentWillMount() {
       this.bag = new TileBag();
@@ -77,8 +81,19 @@ const Root = React.createClass({
     endTurn() {
       
     },
-    exchangeTiles() {
-      
+    openExchangeDialog() {
+      if (this.bag.getTiles().length >= 7 && this.recentlyPlacedTiles.length === 0) {
+        this.setState({isExchangeDialogOpen: true});
+      }
+    },
+    exchangeTiles(tileIds) {
+      let tiles = tileIds.map((id) => this.currentTurnPlayer.getTile(id));
+      this.bag.insert(tiles);
+      for (const id of tileIds) {
+        this.currentTurnPlayer.removeTile(id);
+      }
+      this.currentTurnPlayer.drawToLimit(this.bag);
+      this.setState({players: this.players});
     },
     addToRecentlyPlacedTiles(id) {
       let tile = this.currentTurnPlayer.getTile(id);
@@ -161,6 +176,7 @@ const Root = React.createClass({
           <PlayerHand owner={this.players[1]} parent={this} id={this.playerIds[1]} tiles={this.players[1].getHand()}/>
           <PlayerHand owner={this.players[2]} parent={this} id={this.playerIds[2]} tiles={this.players[2].getHand()}/>
           <Board cellClasses={this.createBoard()} parent={this} />
+          <ExchangeDialog isOpen={this.state.isExchangeDialogOpen} parent={this} tiles={this.currentTurnPlayer.getHand()}/>
           <PlayerHand owner={this.players[3]} parent={this} id={this.playerIds[3]} tiles={this.players[3].getHand()}/>
           <PlayerHand owner={this.players[0]} parent={this} id={this.playerIds[0]} tiles={this.players[0].getHand()}/>
         </div>
