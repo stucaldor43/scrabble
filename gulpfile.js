@@ -50,7 +50,7 @@ var watch1 = gulp.watch("src/js/*.js", ["es6ify"]);
 watch1.on("change", notify);
 var watch2 = gulp.watch("src/**/*.scss", ["sassify"]);
 watch2.on("change", notify);
-var watch3 = gulp.watch("src/**/*.css", ["css-port"]);
+var watch3 = gulp.watch("src/css/*.css", ["css-port"]);
 watch3.on("change", notify);
 var watch4 = gulp.watch("src/**/*.map", ["map-port"]);
 watch4.on("change", notify);
