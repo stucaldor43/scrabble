@@ -45,7 +45,7 @@ export default React.createClass({
          </div>
          <div>
            <button onClick={this.exchange} className="btn btn-success">Exchange Chosen Tiles</button>
-           <button onClic={this.cancelExchange} className="btn btn-danger">Cancel</button>
+           <button onClick={this.cancelExchange} className="btn btn-danger">Cancel</button>
          </div>
        </div>
        : null);
