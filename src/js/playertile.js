@@ -35,7 +35,7 @@ const PlayerTile = React.createClass({
        
        return connectDragSource(
          <div style={{display: "inline-block"}}>
-           <img src={this.props.src} />
+           <img src={this.props.src} width="81" height="81" />
          </div>
        );
    } 
