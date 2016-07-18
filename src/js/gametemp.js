@@ -393,9 +393,11 @@ const Root = React.createClass({
       this.setPlayerToGoFirst(); 
     },
     render() {
+      const playerScores = this.state.players.map((player) => player.score);
+      
       return (
         <div class="container-fluid">
-          <ScoreBoard />
+          <ScoreBoard scores={playerScores}/>
           <Controls parent={this}/>
           <PlayerHand owner={this.players[1]} parent={this} id={this.playerIds[1]} tiles={this.players[1].getHand()}/>
           <PlayerHand owner={this.players[2]} parent={this} id={this.playerIds[2]} tiles={this.players[2].getHand()}/>
