@@ -43,6 +43,11 @@ const Direction = {
   UP: "up",
   DOWN: "down"
 };
+const DOUBLEWORDCLASS = "double-word";
+const TRIPLEWORDCLASS = "triple-word";
+const DOUBLELETTERCLASS = "double-letter";
+const TRIPLELETTERCLASS = "triple-letter";
+const FREECLASS = "free";
 
 const Root = React.createClass({
     getDefaultProps() {
@@ -99,22 +104,52 @@ const Root = React.createClass({
     },
     endTurn() {
       if (this.recentlyPlacedTiles.length >= 1) {
-        this.updatePlayerScores();
+        const info = this.getTurnInformation();
+        const { allTilesArePartOfTheSameWord, isRecentlyPlacedCellAFreeSpace } = info;
+        const { tilePlacedThisTurnIsAdjacentToPreviouslyPlacedTile, allWordsAreLegal} = info;
+        const { score } = info;
+        const tilesInSameRowOrColumn = this.recentlyPlacedTilesAreInSameRowOrColumn();
+        
+        if (tilesInSameRowOrColumn && allWordsAreLegal && allTilesArePartOfTheSameWord && 
+        (tilePlacedThisTurnIsAdjacentToPreviouslyPlacedTile || isRecentlyPlacedCellAFreeSpace)) {
+          this.currentTurnPlayer.setScore(this.currentTurnPlayer.getScore() + score);
+        }
+        else {
+          while(this.recentlyPlacedTiles.length > 0) {
+            this.undo();
+          }  
+        }
         this.resetRecentlyPlacedTiles();
+        this.setState({players: this.players});
       }
       this.replenishCurrentTurnPlayerHand();
       this.shiftCurrentTurnPlayer();
     },
-    updatePlayerScores() {
+    getTurnInformation() {
       let newestCells = [];
       for (let tile of this.recentlyPlacedTiles) {
         newestCells.push(this.getCellFromTileCellList(tile.id));
       }
+      const isRecentlyPlacedCellAFreeSpace = newestCells.some((cell) => {
+        return cell.props.row === Math.floor(ROWLIMIT / 2) && 
+        cell.props.col === Math.floor(COLUMNLIMIT / 2);
+      });
+      const tilePlacedThisTurnIsAdjacentToPreviouslyPlacedTile = newestCells.some((cell, i, arr) => {
+        const adjacentCells = this.getAdjacentCellContents(cell.props.row, cell.props.col);
+        let allAdjacentCells = [adjacentCells.left, adjacentCells.right, adjacentCells.above, adjacentCells.below];
+        allAdjacentCells = allAdjacentCells.filter((cell) => cell !== null && typeof cell === "object");
+        for (const nearbyCell of allAdjacentCells) {
+          if (arr.indexOf(nearbyCell) === -1) {
+            return true;
+          }
+        }
+        return false;
+      }); 
       const cellsWithBonus = newestCells.filter((cell) => {
         const classes = cell.props.classAttrName.split(" ");
-        return (classes.includes("triple-word") || classes.includes("double-letter") ||
-        classes.includes("double-word") || classes.includes("triple-letter") ||
-        classes.includes("free"));
+        return (classes.includes(TRIPLEWORDCLASS) || classes.includes(DOUBLELETTERCLASS) ||
+        classes.includes(DOUBLEWORDCLASS) || classes.includes(TRIPLELETTERCLASS) ||
+        classes.includes(FREECLASS));
       });
       for (var cell of cellsWithBonus) {
         let tileOnCell = this.getTileFromTileCellList(cell);
@@ -171,19 +206,19 @@ const Root = React.createClass({
         let bonusMultiplier = 1;
         let score = 0;
         for (let tile of wordTilesList) {
-          if (tile.cellClass && (tile.cellClass.includes("double-word") ||
-          tile.cellClass.includes("free"))) {
+          if (tile.cellClass && (tile.cellClass.includes(DOUBLEWORDCLASS) ||
+          tile.cellClass.includes(FREECLASS))) {
             bonusMultiplier *= 2;
             score += tile.value;
           }
-          else if (tile.cellClass && tile.cellClass.includes("triple-word")) {
+          else if (tile.cellClass && tile.cellClass.includes(TRIPLEWORDCLASS)) {
             bonusMultiplier *= 3;
             score += tile.value;
           }
-          else if (tile.cellClass && tile.cellClass.includes("double-letter")) {
+          else if (tile.cellClass && tile.cellClass.includes(DOUBLELETTERCLASS)) {
             score += (tile.value * 2);
           }
-          else if (tile.cellClass && tile.cellClass.includes("triple-letter")) {
+          else if (tile.cellClass && tile.cellClass.includes(TRIPLELETTERCLASS)) {
             score += (tile.value * 3);
           }
           else {
@@ -197,7 +232,29 @@ const Root = React.createClass({
         let tileOnCell = this.getTileFromTileCellList(cell);
         delete tileOnCell.cellClass;
       }
-      return score;
+      const formedWords = listOfListsContainingWordFormingTiles.map((wordTilesList) => {
+        return wordTilesList.map((tile) => tile.name).join("");
+      });
+      const allWordsAreLegal = formedWords.every((word) => this.legalWordList.indexOf(word) >= 0 );
+      const allTilesArePartOfTheSameWord = listOfListsContainingWordFormingTiles.some((wordTilesList) => {
+        return this.recentlyPlacedTiles.every((tile) => wordTilesList.indexOf(tile) >= 0 );
+      });
+      return {
+        score: score,
+        allTilesArePartOfTheSameWord: allTilesArePartOfTheSameWord,
+        isRecentlyPlacedCellAFreeSpace: isRecentlyPlacedCellAFreeSpace,
+        tilePlacedThisTurnIsAdjacentToPreviouslyPlacedTile: tilePlacedThisTurnIsAdjacentToPreviouslyPlacedTile,
+        allWordsAreLegal: allWordsAreLegal
+      };
+    },
+    recentlyPlacedTilesAreInSameRowOrColumn() {
+      const cellsOfRecentlyPlacedTiles = this.recentlyPlacedTiles.map((tile) => this.getCellFromTileCellList(tile.id));
+      return cellsOfRecentlyPlacedTiles.every((cell, i, arr) => arr.every((arrCell) => {
+        return arrCell.props.row === cell.props.row || arrCell.props.col === cell.props.col;
+      }));
+    },
+    areFormedWordsLegal(wordList) {
+      return wordList.every((word) => this.legalWordList.indexOf(word) >= 0 );
     },
     getFurthestConnectedCellInGivenDirection(row, col, direction) {
         if (direction === Direction.UP || direction === Direction.DOWN) {
@@ -234,6 +291,7 @@ const Root = React.createClass({
       }
       this.currentTurnPlayer.drawToLimit(this.bag);
       this.setState({players: this.players});
+      this.shiftCurrentTurnPlayer();
     },
     addToRecentlyPlacedTiles(id) {
       let tile = this.currentTurnPlayer.getTile(id);
@@ -257,12 +315,6 @@ const Root = React.createClass({
     },
     setPlayerToGoFirst() {
       this.currentTurnPlayer = this.players[Math.floor(Math.random() * this.props.numberOfPlayers)]; 
-    },
-    isFreeSpaceOccupied() {
-      return this.tileCellList.some((tileCell) => {
-        return (tileCell.cell.props.row === Math.floor(ROWLIMIT / 2) &&
-        tileCell.cell.props.col === Math.floor(COLUMNLIMIT / 2));
-      });
     },
     replenishCurrentTurnPlayerHand() {
       this.currentTurnPlayer.drawToLimit(this.bag);

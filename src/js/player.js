@@ -1,11 +1,20 @@
     export default function Player(opts={status: "active"}) {
-      this.hand = []; 
+      this.hand = [];
+      this.score = 0;
       this.rackLimit = 7;
       this.status = opts.status;
     }
     
     Player.prototype.getStatus = function() {
       return this.status;  
+    };
+    
+    Player.prototype.getScore = function() {
+      return this.score;
+    };
+    
+    Player.prototype.setScore = function(newScore) {
+      this.score = newScore;
     };
     
     Player.prototype.getHand = function() {
