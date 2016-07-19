@@ -12,8 +12,8 @@ export default React.createClass({
        });
 
        return (
-           <div class="row">
-            <div class="col-xs-12">
+           <div className="row">
+            <div className="col-xs-12">
                 { scoreList }
             </div> 
            </div>

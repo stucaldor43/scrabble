@@ -397,7 +397,7 @@ const Root = React.createClass({
       const playerScores = this.state.players.map((player) => player.score);
       
       return (
-        <div class="container-fluid">
+        <div className="container-fluid">
           <ScoreBoard scores={playerScores}/>
           <Controls parent={this}/>
           <PlayerHand owner={this.players[1]} parent={this} id={this.playerIds[1]} tiles={this.players[1].getHand()}/>
