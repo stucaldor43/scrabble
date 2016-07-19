@@ -68,6 +68,7 @@ const Root = React.createClass({
         this.cellRefs[i] = new Array(COLUMNLIMIT);
       }
       this.legalWordList = words;
+      this.consecutiveScorelessTurnsCount = 0;
       this.start();
       this.setState({players: this.players});
     },
@@ -90,7 +91,8 @@ const Root = React.createClass({
       if (this.recentlyPlacedTiles.length === 0) {
         this.shiftCurrentTurnPlayer();
       }
-      
+      this.consecutiveScorelessTurnsCount++;
+      this.gameTerminationCheck();
     },
     undo() {
       if (this.recentlyPlacedTiles.length >= 1) {
@@ -113,16 +115,23 @@ const Root = React.createClass({
         if (tilesInSameRowOrColumn && allWordsAreLegal && allTilesArePartOfTheSameWord && 
         (tilePlacedThisTurnIsAdjacentToPreviouslyPlacedTile || isRecentlyPlacedCellAFreeSpace)) {
           this.currentTurnPlayer.setScore(this.currentTurnPlayer.getScore() + score);
+          this.consecutiveScorelessTurnsCount = 0;
         }
         else {
           while(this.recentlyPlacedTiles.length > 0) {
             this.undo();
-          }  
+          } 
+          this.consecutiveScorelessTurnsCount++; 
         }
         this.resetRecentlyPlacedTiles();
         this.setState({players: this.players});
       }
+      else if (this.recentlyPlacedTiles.length === 0) {
+        this.pass();
+        return;
+      }
       this.replenishCurrentTurnPlayerHand();
+      this.gameTerminationCheck();
       this.shiftCurrentTurnPlayer();
     },
     getTurnInformation() {
@@ -292,6 +301,8 @@ const Root = React.createClass({
       }
       this.currentTurnPlayer.drawToLimit(this.bag);
       this.setState({players: this.players});
+      this.consecutiveScorelessTurnsCount++;
+      this.gameTerminationCheck;
       this.shiftCurrentTurnPlayer();
     },
     addToRecentlyPlacedTiles(id) {
@@ -351,6 +362,44 @@ const Root = React.createClass({
       for (let p of this.players) {
         p.drawToLimit(this.bag);
       }
+    },
+    isGameOver() {
+      if ((this.bag.isEmpty() && this.currentTurnPlayer.getHand().length === 0) || 
+      this.consecutiveScorelessTurnsCount >= 6 ) {
+        return true;
+      }
+      return false;
+    },
+    gameTerminationCheck() {
+      if (this.isGameOver()) {
+        for (const p of this.players) {
+          const tileValueSum = p.getHand().reduce((prev, curr) => {
+            prev += curr.value;
+            return prev;
+          }, 0);
+          p.setScore(p.getScore() - tileValueSum);
+
+          if (p.getHand().length === 0) {
+            const opposingPlayers = this.players.filter((player) => player !== p);
+            const sumOfOpposingPlayersTiles = opposingPlayers.reduce((prev, curr) => {
+              const opposingPlayersTileValueSum = curr.getHand().reduce((tileSum, tile) => {
+                tileSum += tile.value;
+                return tileSum;
+              }, 0);
+              prev += opposingPlayersTileValueSum;
+              return prev; 
+            }, 0);
+            p.setScore(p.getScore() + sumOfOpposingPlayersTiles);
+          }
+        }
+
+        for (const p of this.players) {
+          p.setHand([]);
+        }
+        this.setState({players: this.players});
+        
+      }
+      
     },
     componentDidMount() {
       
