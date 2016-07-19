@@ -239,8 +239,9 @@ const Root = React.createClass({
       const allTilesArePartOfTheSameWord = listOfListsContainingWordFormingTiles.some((wordTilesList) => {
         return this.recentlyPlacedTiles.every((tile) => wordTilesList.indexOf(tile) >= 0 );
       });
+      const allTilesUsedBonus = (this.recentlyPlacedTiles.length === 7 ? 50 : 0);
       return {
-        score: score,
+        score: score + allTilesUsedBonus,
         allTilesArePartOfTheSameWord: allTilesArePartOfTheSameWord,
         isRecentlyPlacedCellAFreeSpace: isRecentlyPlacedCellAFreeSpace,
         tilePlacedThisTurnIsAdjacentToPreviouslyPlacedTile: tilePlacedThisTurnIsAdjacentToPreviouslyPlacedTile,
