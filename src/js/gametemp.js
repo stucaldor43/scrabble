@@ -97,6 +97,9 @@ const Root = React.createClass({
     undo() {
       if (this.recentlyPlacedTiles.length >= 1) {
         const tile = this.recentlyPlacedTiles.pop();
+        if (tile.src.indexOf("blank") >= 0) {
+          tile.name = "blank";
+        }
         this.currentTurnPlayer.addTile(tile);
         this.setState({players: this.players});
         const cell = this.getCellFromTileCellList(tile.id);

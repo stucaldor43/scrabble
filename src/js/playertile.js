@@ -17,6 +17,10 @@ let tileSource = {
     }
     
     target.setContents(props.src);
+    if (props.src.indexOf("blank") >= 0) {
+      const draggedTile = props.owner.getTile(tileId);
+      draggedTile.name = props.root.blankTileValue;
+    }
     props.root.addToTileCellList(tileId, target);
     props.root.addToRecentlyPlacedTiles(tileId);
     props.root.removeTile(tileId);
