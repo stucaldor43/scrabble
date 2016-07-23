@@ -32,10 +32,13 @@ const Cell = React.createClass({
     const { root } = this.props;
 
     if (highlightedTile) {
-     this.setState({occupant: <img src={highlightedTile.src} />});
+     if (highlightedTile.src.indexOf("blank") >= 0) {
+       highlightedTile.name = root.blankTileValue;
+     }
      root.addToTileCellList(highlightedTile.id, this);
      root.addToRecentlyPlacedTiles(highlightedTile.id);
      root.removeTile(highlightedTile.id);
+     this.setState({occupant: <img src={highlightedTile.src} />});
      root.setState({players: root.players, highlightedTile: null});  
     }
    },
