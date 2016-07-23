@@ -3,6 +3,12 @@ body {
     font-family: sans-serif;
 }
 
+/* Tile styles */
+.current-selection {
+    border: thick solid mediumpurple;
+}
+
+/* Board styles */
 .square {
     display: inline-block;
     width: 6.65%;
@@ -39,6 +45,7 @@ body {
     background-color: white;
 }
 
+/* Exchange dialog */
 .exchange-candidate {
     border: thick solid gold;
 }

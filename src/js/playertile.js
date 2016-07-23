@@ -34,12 +34,27 @@ function collect(connect, monitor) {
 }
 
 const PlayerTile = React.createClass({
+   toggleTileSelection() {
+       const { owner, tileId } = this.props;
+       const { highlightedTile } = this.props.root.state;
+
+       if (this.props.root.currentTurnPlayer === owner) {
+         if (!highlightedTile || highlightedTile.id !== tileId) {
+          this.props.root.setState({highlightedTile: owner.getTile(tileId)});
+         }
+         else {
+          this.props.root.setState({highlightedTile: null}); 
+         }
+       }
+   },
    render() {
        let {connectDragSource} = this.props;
-       
+       const { isHighlighted } = this.props;
+
        return connectDragSource(
          <div style={{display: "inline-block"}}>
-           <img src={this.props.src} width="81" height="81" />
+           <img src={this.props.src} onClick={this.toggleTileSelection} width="81" height="81" 
+           className={isHighlighted ? "current-selection" : ""} />
          </div>
        );
    } 

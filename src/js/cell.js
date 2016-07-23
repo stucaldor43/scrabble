@@ -27,6 +27,18 @@ const Cell = React.createClass({
      const { row, col } = this.props;
      this.props.root.cellRefs[row][col] = this;  
    },
+   handleClick() {
+    const { highlightedTile } = this.props.root.state;
+    const { root } = this.props;
+
+    if (highlightedTile) {
+     this.setState({occupant: <img src={highlightedTile.src} />});
+     root.addToTileCellList(highlightedTile.id, this);
+     root.addToRecentlyPlacedTiles(highlightedTile.id);
+     root.removeTile(highlightedTile.id);
+     root.setState({players: root.players, highlightedTile: null});  
+    }
+   },
    setContents(src) {
      this.setState({occupant: <img src={src} />});   
    },
@@ -37,7 +49,7 @@ const Cell = React.createClass({
        let { connectDropTarget } = this.props;
        
        return connectDropTarget(
-         <div className={this.props.classAttrName}>
+         <div onClick={this.handleClick} className={this.props.classAttrName}>
            {this.state.occupant || ""}
          </div>
        );

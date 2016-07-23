@@ -7,7 +7,8 @@ export default React.createClass({
     },
     render() {
       let renderedTiles = this.props.tiles.map(function(curr) {
-        return <PlayerTile owner={this.props.owner} root={this.props.parent} src={curr.src} tileId={curr.id} />;
+        const isHighlighted = (this.props.parent.state.highlightedTile === curr);
+        return <PlayerTile isHighlighted={isHighlighted} owner={this.props.owner} root={this.props.parent} src={curr.src} tileId={curr.id} />;
       }.bind(this));
       
       return(

@@ -54,7 +54,7 @@ const Root = React.createClass({
       return {numberOfPlayers: 2};
     },
     getInitialState() {
-      return {isExchangeDialogOpen: false};
+      return {isExchangeDialogOpen: false, highlightedTile: null};
     },
     componentWillMount() {
       this.bag = new TileBag();
@@ -87,12 +87,16 @@ const Root = React.createClass({
       const index = this.tileCellList.findIndex((tileCell) => tileCell.cell === cell );
       return (index >= 0 ? this.tileCellList[index].tile : null);
     },
+    removeTileHighlightEffect() {
+      this.setState({highlightedTile: null});
+    },
     pass() {
       if (this.recentlyPlacedTiles.length === 0) {
         this.shiftCurrentTurnPlayer();
       }
       this.consecutiveScorelessTurnsCount++;
       this.gameTerminationCheck();
+      this.removeTileHighlightEffect();
     },
     undo() {
       if (this.recentlyPlacedTiles.length >= 1) {
@@ -135,6 +139,7 @@ const Root = React.createClass({
       }
       this.replenishCurrentTurnPlayerHand();
       this.gameTerminationCheck();
+      this.removeTileHighlightEffect();
       this.shiftCurrentTurnPlayer();
     },
     getTurnInformation() {
@@ -306,6 +311,7 @@ const Root = React.createClass({
       this.setState({players: this.players});
       this.consecutiveScorelessTurnsCount++;
       this.gameTerminationCheck;
+      this.removeTileHighlightEffect();
       this.shiftCurrentTurnPlayer();
     },
     addToRecentlyPlacedTiles(id) {
