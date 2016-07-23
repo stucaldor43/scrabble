@@ -1,6 +1,9 @@
 import React from "react"
 
 export default React.createClass({
+   propTypes: {
+       scores: React.PropTypes.arrayOf(React.PropTypes.number)
+   },
    render() {
        const scoreList = this.props.scores.map((score, i) => {
         return(

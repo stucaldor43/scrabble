@@ -1,6 +1,9 @@
 import React from "react";
 
 export default React.createClass({
+   propTypes: {
+       parent: React.PropTypes.object.isRequired
+   },
    setBlankTileValue() {
        this.props.parent.blankTileValue = this.tileValueSelectBox.value;
    },

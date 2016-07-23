@@ -23,6 +23,13 @@ const Cell = React.createClass({
    getInitialState() {
      return {occupant: null};
    },
+   propTypes: {
+     root: React.PropTypes.object.isRequired,
+     row: React.PropTypes.number.isRequired,
+     col: React.PropTypes.number.isRequired,
+     classAttrName: React.PropTypes.string.isRequired
+
+   },
    componentDidMount() {
      const { row, col } = this.props;
      this.props.root.cellRefs[row][col] = this;  

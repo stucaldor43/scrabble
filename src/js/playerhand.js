@@ -5,6 +5,12 @@ export default React.createClass({
     componentDidMount() {
               
     },
+    propTypes: {
+      parent: React.PropTypes.object.isRequired,
+      id: React.PropTypes.string.isRequired,
+      owner: React.PropTypes.object.isRequired,
+      tiles: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
+    },
     render() {
       let renderedTiles = this.props.tiles.map(function(curr) {
         const isHighlighted = (this.props.parent.state.highlightedTile === curr);

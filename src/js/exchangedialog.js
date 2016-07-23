@@ -4,6 +4,11 @@ export default React.createClass({
    getInitialState() {
         return {exchangeTileIds: []};   
    },
+   propTypes: {
+        isOpen: React.PropTypes.bool.isRequired, 
+        parent: React.PropTypes.object.isRequired,
+        tiles: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
+   },
    componentWillMount() {
          
    },

@@ -56,6 +56,9 @@ const Root = React.createClass({
     getInitialState() {
       return {isExchangeDialogOpen: false, highlightedTile: null};
     },
+    propTypes: {
+      numberOfPlayers: React.PropTypes.number.isRequired
+    },
     componentWillMount() {
       this.bag = new TileBag();
       this.bag.shuffle();

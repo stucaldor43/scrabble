@@ -34,6 +34,13 @@ function collect(connect, monitor) {
 }
 
 const PlayerTile = React.createClass({
+   propTypes: {
+       isHighlighted: React.PropTypes.bool.isRequired,
+       owner: React.PropTypes.object.isRequired,
+       root: React.PropTypes.object.isRequired,
+       src: React.PropTypes.string.isRequired,
+       tileId: React.PropTypes.number.isRequired
+   },
    toggleTileSelection() {
        const { owner, tileId } = this.props;
        const { highlightedTile } = this.props.root.state;
