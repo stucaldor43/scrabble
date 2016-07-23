@@ -27,9 +27,9 @@ gulp.task("es6ify-test", function() {
       .pipe(gulp.dest("dist/tests"));
 });
 gulp.task("sassify", function() {
-    return gulp.src("src/css/*.scss")
-      .pipe(sass().on("error", sass.logError));
-
+    return gulp.src("src/css/**/*.scss")
+      .pipe(sass().on("error", sass.logError))
+      .pipe(gulp.dest("src/css"));
 });
 
 gulp.task("css-port", function() {
@@ -52,7 +52,7 @@ var watch2 = gulp.watch("src/**/*.scss", ["sassify"]);
 watch2.on("change", notify);
 var watch3 = gulp.watch("src/css/*.css", ["css-port"]);
 watch3.on("change", notify);
-var watch4 = gulp.watch("src/**/*.map", ["map-port"]);
+var watch4 = gulp.watch("src/css/*.map", ["map-port"]);
 watch4.on("change", notify);
 var watch5 = gulp.watch("src/tests/**/*.js", ["es6ify-test"]);
 watch5.on("change", notify);
