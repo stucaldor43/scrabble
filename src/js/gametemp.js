@@ -413,9 +413,6 @@ const Root = React.createClass({
       }
       
     },
-    componentDidMount() {
-      
-    },
     createBoard() {
       return boardLayout.map((currentRow, i) => {
         let boardTiles = currentRow.map((sym) => {

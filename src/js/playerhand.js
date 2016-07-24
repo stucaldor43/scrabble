@@ -2,9 +2,6 @@ import React from "react";
 import PlayerTile from "./playertile";
 
 export default React.createClass({
-    componentDidMount() {
-              
-    },
     propTypes: {
       parent: React.PropTypes.object.isRequired,
       id: React.PropTypes.string.isRequired,

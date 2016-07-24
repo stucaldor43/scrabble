@@ -9,9 +9,6 @@ export default React.createClass({
         parent: React.PropTypes.object.isRequired,
         tiles: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
    },
-   componentWillMount() {
-         
-   },
    closeExchangeDialog() {
         this.props.parent.setState({isExchangeDialogOpen: false});
    },
