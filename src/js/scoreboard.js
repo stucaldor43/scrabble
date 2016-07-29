@@ -1,23 +1,26 @@
-import React from "react"
+import React from "react";
 
 export default React.createClass({
    propTypes: {
        scores: React.PropTypes.arrayOf(React.PropTypes.number)
    },
+   renderScores() {
+        return this.props.scores.map((score, i) => {
+            return(
+                <li className="score-holder">
+                    <label htmlFor={`score${i}`}>{`Player${i}`}</label>
+                    <input className="score" id={`score${i}`} type="text" value={score} disabled />
+                </li>
+            );
+        });       
+   },
    render() {
-       const scoreList = this.props.scores.map((score, i) => {
-        return(
-            <li>
-                <label htmlFor={`score${i}`}>{`Player${i}`}</label>
-                <input id={`score${i}`} type="text" value={score} disabled />
-            </li>
-        );
-       });
-
        return (
            <div className="row">
             <div className="col-xs-12">
-                { scoreList }
+             <ul className="score-list">
+                { this.renderScores() }
+             </ul>
             </div> 
            </div>
        );
