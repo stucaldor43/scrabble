@@ -32,18 +32,19 @@ export default React.createClass({
        }
        this.setState({exchangeTileIds: exchangeTileIds});
    },
-   render() {
-       let tileImages = this.props.tiles.map((tile) => {
+   renderTileImages() {
+      return this.props.tiles.map((tile) => {
          let { exchangeTileIds } = this.state;
-         let isMarkedForExchange = exchangeTileIds.includes(tile.id);
+         let isMarkedForExchange = exchangeTileIds.some((currId) => currId === tile.id);
          return <img className={isMarkedForExchange ? "exchange-candidate" : ""} 
          onClick={this.toggleSelect.bind(null, tile.id)} src={tile.src} />;        
-       });
-       
+      }); 
+   },
+   render() {
        return(this.props.isOpen ?
        <div className="dialog">
          <div>
-           {tileImages}
+           { this.renderTileImages() }
          </div>
          <div>
            <button onClick={this.exchange} className="btn btn-success">Exchange Chosen Tiles</button>
@@ -52,4 +53,4 @@ export default React.createClass({
        </div>
        : null);
    } 
-});
+});   
