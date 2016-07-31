@@ -1,7 +1,7 @@
 import React from "react";
 import PlayerTile from "./playertile";
 
-export default React.createClass({
+const PlayerHand = React.createClass({
     propTypes: {
       parent: React.PropTypes.object.isRequired,
       id: React.PropTypes.string.isRequired,
@@ -22,3 +22,5 @@ export default React.createClass({
     
     } 
 });
+
+export default PlayerHand;
