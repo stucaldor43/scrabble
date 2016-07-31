@@ -8,15 +8,16 @@ const PlayerHand = React.createClass({
       owner: React.PropTypes.object.isRequired,
       tiles: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
     },
-    render() {
-      let renderedTiles = this.props.tiles.map(function(curr) {
+    renderTiles() {
+      return this.props.tiles.map((curr) => {
         const isHighlighted = (this.props.parent.state.highlightedTile === curr);
         return <PlayerTile isHighlighted={isHighlighted} owner={this.props.owner} root={this.props.parent} src={curr.src} tileId={curr.id} />;
-      }.bind(this));
-      
+      });
+    },
+    render() {
       return(
         <div id={this.props.id}>
-          {renderedTiles}
+          { this.renderTiles() }
         </div>
       );
     
