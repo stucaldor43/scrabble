@@ -1,6 +1,6 @@
 import React from "react";
 
-export default React.createClass({
+const Controls = React.createClass({
    propTypes: {
        parent: React.PropTypes.object.isRequired
    },
@@ -36,3 +36,5 @@ export default React.createClass({
        );
    } 
 });
+
+export default Controls;

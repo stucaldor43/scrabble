@@ -1,6 +1,6 @@
 import React from "react";
 
-export default React.createClass({
+const ScoreBoard = React.createClass({
    propTypes: {
        scores: React.PropTypes.arrayOf(React.PropTypes.number)
    },
@@ -26,3 +26,5 @@ export default React.createClass({
        );
    } 
 });
+
+export default ScoreBoard;

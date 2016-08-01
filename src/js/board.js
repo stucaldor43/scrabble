@@ -1,7 +1,7 @@
 import React from "react";
 import Cell from "./cell";
 
-export default React.createClass({
+const Board = React.createClass({
    propTypes: {
       cellClasses: React.PropTypes.arrayOf(React.PropTypes.arrayOf(React.PropTypes.string)).isRequired,
       parent: React.PropTypes.object.isRequired
@@ -22,3 +22,5 @@ export default React.createClass({
       );
    } 
 });
+
+export default Board;

@@ -1,6 +1,6 @@
 import React from "react";
 
-export default React.createClass({
+const ExchangeDialog = React.createClass({
    getInitialState() {
         return {exchangeTileIds: []};   
    },
@@ -53,4 +53,6 @@ export default React.createClass({
        </div>
        : null);
    } 
-});   
+});
+
+export default ExchangeDialog;
