@@ -6,7 +6,8 @@ const PlayerHand = React.createClass({
       parent: React.PropTypes.object.isRequired,
       id: React.PropTypes.string.isRequired,
       owner: React.PropTypes.object.isRequired,
-      tiles: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
+      tiles: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+      isActive: React.PropTypes.bool.isRequired
     },
     renderTiles() {
       return this.props.tiles.map((curr) => {
@@ -16,7 +17,7 @@ const PlayerHand = React.createClass({
     },
     render() {
       return(
-        <div id={this.props.id}>
+        <div id={this.props.id} className={this.props.isActive ? "active" : ""}>
           { this.renderTiles() }
         </div>
       );

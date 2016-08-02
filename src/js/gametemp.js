@@ -458,12 +458,16 @@ const Root = React.createClass({
         <div className="container-fluid">
           <ScoreBoard scores={playerScores}/>
           <Controls parent={this}/>
-          <PlayerHand owner={this.players[1]} parent={this} id={this.playerIds[1]} tiles={this.players[1].getHand()}/>
-          <PlayerHand owner={this.players[2]} parent={this} id={this.playerIds[2]} tiles={this.players[2].getHand()}/>
+          <PlayerHand isActive={this.players[1] === this.currentTurnPlayer} 
+          owner={this.players[1]} parent={this} id={this.playerIds[1]} tiles={this.players[1].getHand()}/>
+          <PlayerHand isActive={this.players[2] === this.currentTurnPlayer}
+          owner={this.players[2]} parent={this} id={this.playerIds[2]} tiles={this.players[2].getHand()}/>
           <Board cellClasses={this.createBoard()} parent={this} />
           <ExchangeDialog isOpen={this.state.isExchangeDialogOpen} parent={this} tiles={this.currentTurnPlayer.getHand()}/>
-          <PlayerHand owner={this.players[3]} parent={this} id={this.playerIds[3]} tiles={this.players[3].getHand()}/>
-          <PlayerHand owner={this.players[0]} parent={this} id={this.playerIds[0]} tiles={this.players[0].getHand()}/>
+          <PlayerHand isActive={this.players[3] === this.currentTurnPlayer}
+          owner={this.players[3]} parent={this} id={this.playerIds[3]} tiles={this.players[3].getHand()}/>
+          <PlayerHand isActive={this.players[0] === this.currentTurnPlayer}
+          owner={this.players[0]} parent={this} id={this.playerIds[0]} tiles={this.players[0].getHand()}/>
         </div>
       );
     } 
