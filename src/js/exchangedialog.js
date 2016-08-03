@@ -24,7 +24,7 @@ const ExchangeDialog = React.createClass({
    },
    toggleSelect(i) {
        let { exchangeTileIds } = this.state;
-       if (exchangeTileIds.includes(i)) {
+       if (exchangeTileIds.indexOf(i) >= 0) {
          exchangeTileIds = exchangeTileIds.filter((id) => id !== i);
        }
        else {
@@ -41,17 +41,19 @@ const ExchangeDialog = React.createClass({
       }); 
    },
    render() {
-       return(this.props.isOpen ?
-       <div className="dialog">
-         <div>
-           { this.renderTileImages() }
-         </div>
-         <div>
-           <button onClick={this.exchange} className="btn btn-success">Exchange Chosen Tiles</button>
-           <button onClick={this.cancelExchange} className="btn btn-danger">Cancel</button>
-         </div>
-       </div>
-       : null);
+       const styles = this.props.isOpen ? {} : {display: "none"};  
+       
+       return(
+          <div className="dialog" style={styles}>
+            <div>
+              { this.renderTileImages() }
+            </div>
+            <div>
+              <button id="dialog-submit" onClick={this.exchange} className="btn btn-success">Exchange Chosen Tiles</button>
+              <button id="dialog-cancel" onClick={this.cancelExchange} className="btn btn-danger">Cancel</button>
+            </div>
+          </div>
+       );
    } 
 });
 
