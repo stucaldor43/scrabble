@@ -38,7 +38,7 @@ const Cell = React.createClass({
     const { highlightedTile } = this.props.root.state;
     const { root } = this.props;
 
-    if (highlightedTile) {
+    if (highlightedTile && !this.state.occupant) {
      if (highlightedTile.src.indexOf("blank") >= 0) {
        highlightedTile.name = root.blankTileValue;
      }
