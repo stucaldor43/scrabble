@@ -1,4 +1,4 @@
-import { DIRECTIONS, STATUS } from "./constants"
+import { Directions, Status } from "./constants"
 import dictionary from "an-array-of-english-words";
 
 function getAdjacentCells(row, col, boardCells) {
@@ -19,7 +19,7 @@ function getAdjacentCells(row, col, boardCells) {
     }].map((cell) => {
         if (cell.row  < 0 || cell.row > rowLimit - 1 ||
         cell.col < 0 || cell.col > colLimit - 1) {
-            return STATUS.NONEXISTENT;
+            return Status.NONEXISTENT;
         }
         return boardCells[cell.row][cell.col];
     });
@@ -35,19 +35,19 @@ function getOppositeDirection(direction) {
     let oppositeDirection;
     
     switch(direction) {
-        case DIRECTIONS.UP:
-            oppositeDirection = DIRECTIONS.DOWN;
+        case Directions.UP:
+            oppositeDirection = Directions.DOWN;
             break;
-        case DIRECTIONS.DOWN:
-            oppositeDirection = DIRECTIONS.UP;
+        case Directions.DOWN:
+            oppositeDirection = Directions.UP;
             break;
-        case DIRECTIONS.LEFT: 
-            oppositeDirection = DIRECTIONS.RIGHT;
+        case Directions.LEFT: 
+            oppositeDirection = Directions.RIGHT;
             break;
-        case DIRECTIONS.RIGHT:
-            oppositeDirection = DIRECTIONS.LEFT;
+        case Directions.RIGHT:
+            oppositeDirection = Directions.LEFT;
             break;
-        default: throw new Error("Illegal direction value")
+        default: throw new Error("Illegal direction value");
     }
     return oppositeDirection;
 }
@@ -57,19 +57,19 @@ function getDeltas(direction) {
     let colDelta;
     
     switch(direction) {
-        case DIRECTIONS.UP:
+        case Directions.UP:
             rowDelta = -1;
             colDelta = 0;
             break;
-        case DIRECTIONS.DOWN:
+        case Directions.DOWN:
             rowDelta = 1;
             colDelta = 0;
             break;
-        case DIRECTIONS.LEFT:
+        case Directions.LEFT:
             rowDelta = 0;
             colDelta = -1;
             break;
-        case DIRECTIONS.RIGHT:
+        case Directions.RIGHT:
             rowDelta = 0;
             colDelta = 1;
             break;
@@ -82,7 +82,7 @@ function getDeltas(direction) {
 function getListOfAdjacentOccupiedCellDirections(adjacentCells) {
     let occupiedCellDirections = [];
     for (const direction in adjacentCells) {
-        if (adjacentCells[direction] !== STATUS.NONEXISTENT) {
+        if (adjacentCells[direction] !== Status.NONEXISTENT) {
             if (adjacentCells[direction].length) {
                 occupiedCellDirections.push(direction);
             }
@@ -195,8 +195,9 @@ function boardSolution(boardCells, tiles) {
     for (let rowIndex = 0; rowIndex < boardCells.length; rowIndex++) {
         for (let colIndex = 0; colIndex < boardCells[rowIndex].length; colIndex++) {
             if (boardCells[rowIndex][colIndex].length) {
-                for (const direction in DIRECTIONS) {
-                    const { rowDelta, colDelta } = getDeltas(DIRECTIONS[direction]);
+                for (const direction in Directions) {
+                    const currentDirection = Directions[direction];
+                    const { rowDelta, colDelta } = getDeltas(currentDirection);
                     let row = rowIndex;
                     let col = colIndex;
                     const listOfIndicesOfTilesInDirection = [];
@@ -210,10 +211,10 @@ function boardSolution(boardCells, tiles) {
                         col += colDelta;
                     }
                     
-                    const oppositeDirection = getOppositeDirection(DIRECTIONS[direction]);
+                    const oppositeDirection = getOppositeDirection(currentDirection);
                     const cellsAdjacentToInitialPosition = getAdjacentCells(rowIndex, colIndex, boardCells);
                     
-                    if (cellsAdjacentToInitialPosition[oppositeDirection] !== STATUS.NONEXISTENT) {
+                    if (cellsAdjacentToInitialPosition[oppositeDirection] !== Status.NONEXISTENT) {
                         if (cellsAdjacentToInitialPosition[oppositeDirection].length) {
                             continue;
                         }
@@ -245,12 +246,12 @@ function boardSolution(boardCells, tiles) {
                     
                     let wordListWhenIgnoringTileQuantities;
                     const lettersFromHand = tiles.map((tile) => tile.name.toLowerCase()).join("");
-                    if (DIRECTIONS[direction] === DIRECTIONS.DOWN ||
-                    DIRECTIONS[direction] === DIRECTIONS.RIGHT) {
+                    if (currentDirection === Directions.DOWN ||
+                    currentDirection === Directions.RIGHT) {
                         wordListWhenIgnoringTileQuantities = getWordsStartingWithLetter(boardCells[rowIndex][colIndex], lettersFromHand, freeSpaces + 1 );
                     }
-                    else if (DIRECTIONS[direction] === DIRECTIONS.UP ||
-                    DIRECTIONS[direction] === DIRECTIONS.LEFT) {
+                    else if (currentDirection === Directions.UP ||
+                    currentDirection === Directions.LEFT) {
                         wordListWhenIgnoringTileQuantities = getWordsEndingWithLetter(boardCells[rowIndex][colIndex], lettersFromHand, freeSpaces + 1 );    
                     }
                     
@@ -261,12 +262,12 @@ function boardSolution(boardCells, tiles) {
                             const word = makeableWords[Math.floor(Math.random() * makeableWords.length)];
                             const indices = getIndicesWhereTilesWillBePlaced(listOfIndicesOfTilesInDirection, word.length);
                             
-                            if (DIRECTIONS[direction] === DIRECTIONS.DOWN ||
-                            DIRECTIONS[direction] === DIRECTIONS.RIGHT) {
+                            if (currentDirection === Directions.DOWN ||
+                            currentDirection === Directions.RIGHT) {
                                 addTileNameToIndicesWhenDirectionIsDownOrRight(indices, word);
                             }
-                            else if (DIRECTIONS[direction] === DIRECTIONS.UP ||
-                            DIRECTIONS[direction] === DIRECTIONS.LEFT) {
+                            else if (currentDirection === Directions.UP ||
+                            currentDirection === Directions.LEFT) {
                                 addTileNameToIndicesWhenDirectionIsUpOrLeft(indices, word);
                             }
                             
