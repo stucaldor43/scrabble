@@ -176,6 +176,8 @@ function addTileNameToIndicesWhenDirectionIsDownOrRight(indices, word) {
     });
 }
 
+
+
 function addTileIdsToIndices(indices, tiles) {
     const usedTiles = [];
     return indices.map((currIndices) => {
@@ -191,7 +193,45 @@ function addTileIdsToIndices(indices, tiles) {
     });
 }
 
-function boardSolution(boardCells, tiles) {
+function findFreeSpaceCount(indices, boardCells) {
+    let freeSpaces = 0;
+        for (let i = 0; i < indices.length; i++) {
+            const location = indices[i];
+            const adjacentCells = getAdjacentCells(location.row, location.col, boardCells);
+            const occupiedAdjacentCellsCount = getListOfAdjacentOccupiedCellDirections(adjacentCells).length;
+            
+            if (i === 0) {
+                if (occupiedAdjacentCellsCount !== 1) {
+                    break;
+                }
+                freeSpaces++;
+            }   
+            else if (i > 0) {
+                if (occupiedAdjacentCellsCount > 0) {
+                    break;
+                }
+                freeSpaces++;
+            }
+        }
+    return freeSpaces;
+}
+
+function findWordsPossibleToMakeIfOnlyTileNamesAreConsidered(params) {
+    const { direction, initialCellContents, letters, openSpaces } = params;
+    let words;
+    
+    if (direction === Directions.DOWN ||
+    direction === Directions.RIGHT) {
+        words = getWordsStartingWithLetter(initialCellContents, letters, openSpaces );
+    }
+    else if (direction === Directions.UP ||
+    direction === Directions.LEFT) {
+        words = getWordsEndingWithLetter(initialCellContents, letters, openSpaces );    
+    }
+    return words;
+}
+
+function findBoardSolution(boardCells, tiles) {
     for (let rowIndex = 0; rowIndex < boardCells.length; rowIndex++) {
         for (let colIndex = 0; colIndex < boardCells[rowIndex].length; colIndex++) {
             if (boardCells[rowIndex][colIndex].length) {
@@ -224,36 +264,16 @@ function boardSolution(boardCells, tiles) {
                         continue;
                     }
                     
-                    let freeSpaces = 0;
-                    for (let i = 0; i < listOfIndicesOfTilesInDirection.length; i++) {
-                        const location = listOfIndicesOfTilesInDirection[i];
-                        const adjacentCells = getAdjacentCells(location.row, location.col, boardCells);
-                        const occupiedAdjacentCellsCount = getListOfAdjacentOccupiedCellDirections(adjacentCells).length;
-                        
-                        if (i === 0) {
-                            if (occupiedAdjacentCellsCount !== 1) {
-                                break;
-                            }
-                            freeSpaces++;
-                        }   
-                        else if (i > 0) {
-                            if (occupiedAdjacentCellsCount > 0) {
-                                break;
-                            }
-                            freeSpaces++;
-                        }
-                    }
                     
-                    let wordListWhenIgnoringTileQuantities;
+                    const freeSpaces = findFreeSpaceCount(listOfIndicesOfTilesInDirection, boardCells);
                     const lettersFromHand = tiles.map((tile) => tile.name.toLowerCase()).join("");
-                    if (currentDirection === Directions.DOWN ||
-                    currentDirection === Directions.RIGHT) {
-                        wordListWhenIgnoringTileQuantities = getWordsStartingWithLetter(boardCells[rowIndex][colIndex], lettersFromHand, freeSpaces + 1 );
-                    }
-                    else if (currentDirection === Directions.UP ||
-                    currentDirection === Directions.LEFT) {
-                        wordListWhenIgnoringTileQuantities = getWordsEndingWithLetter(boardCells[rowIndex][colIndex], lettersFromHand, freeSpaces + 1 );    
-                    }
+                    const params = {
+                        direction: currentDirection,
+                        initialCellContents: boardCells[rowIndex][colIndex],
+                        letters: lettersFromHand,
+                        openSpaces: freeSpaces + 1
+                    };
+                    let wordListWhenIgnoringTileQuantities = findWordsPossibleToMakeIfOnlyTileNamesAreConsidered(params);
                     
                     if (wordListWhenIgnoringTileQuantities.length) {
                         const makeableWords = wordListWhenIgnoringTileQuantities
@@ -279,24 +299,44 @@ function boardSolution(boardCells, tiles) {
             }
         }
     }
-    return null;
+    if (isBoardEmpty(boardCells)) {
+        const lettersFromHand = tiles.map((tile) => tile.name.toLowerCase()).join("");
+        const words = getWordsContainingOnlyLettersAvailableToPlayer(lettersFromHand, tiles.length);
+        const makeableWords = words.filter((w) => canWordBeCreatedUsingAvailableLetters(w, lettersFromHand));
+        const randomlySelectedWord = makeableWords[Math.floor(Math.random() * makeableWords.length)];
+        const freespaceRowNumber = Math.floor(boardCells.length / 2);
+        const freespaceColumnNumber = Math.floor(boardCells[0].length / 2);
+        const firstColumnNumber = freespaceColumnNumber - (randomlySelectedWord.length - 1);
+        let indices = [];
+        for (let i = firstColumnNumber; i <= freespaceColumnNumber; i++) {
+            indices.push({row: freespaceRowNumber, col: i});
+        }
+        indices = indices.map((curr, i) => {
+            curr.name = randomlySelectedWord.charAt(i);
+            return curr;
+        });
+        addTileIdsToIndices(indices, tiles);
+        return indices;
+    }
+    else {
+        return null;
+    }
 }
-const handTiles = [{name: "a", id: 1}, {name: "c", id: 2}, {name: "t", id: 3},
-{name: "e", id: 4}, {name: "i", id: 5}, {name: "o", id: 6}, {name: "b", id: 7}];
-const cells = [["","","","","","","","","","","","","","",""],
-["","","","","","","","","","","","","m","",""],
-["","","","","","","","","","","","","u","",""],
-["","","","","","","","","","","","","s","",""],
-["","","","","","","","","","","","","c","",""], 
-["","","","","","","","","","","","","l","",""], 
-["","","","","","","","","","","","","e","",""], 
-["","","","","","","","","","","","","","",""], 
-["","","","","","","","","","","","","","",""], 
-["","","","","","","","","","","","","","",""], 
-["","","","","","","","","","","","","","",""], 
-["","","","","","","","","","","","","","",""], 
-["","","","","","","","","","","","","","",""],
-["","","","","","","","","","","","","","",""],
-["","","","","","","","","","","","","","",""]];
-boardSolution(cells, handTiles);
-export default boardSolution;
+
+function getWordsContainingOnlyLettersAvailableToPlayer(optionalLetters, maxWordLength) {
+    const regex = new RegExp(`^[${optionalLetters}]+$`, 'g');
+    return dictionary.filter((w) => {
+        return w.match(regex) && w.length <= maxWordLength;
+    });
+}
+
+function isBoardEmpty(boardCells) {
+    const isNotEmpty = boardCells.some((cellRow) => {
+        return cellRow.some((cell) => {
+            return cell.length;
+        });
+    });
+    return !isNotEmpty;
+}
+
+export default findBoardSolution;

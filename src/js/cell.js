@@ -32,7 +32,8 @@ const Cell = React.createClass({
    },
    componentDidMount() {
      const { row, col } = this.props;
-     this.props.root.cellRefs[row][col] = this;  
+     this.props.root.cellRefs[row][col] = this;
+     this.nameOfTileWithin = "";
    },
    handleClick() {
     const { highlightedTile } = this.props.root.state;
@@ -42,6 +43,7 @@ const Cell = React.createClass({
      if (highlightedTile.src.indexOf("blank") >= 0) {
        highlightedTile.name = root.blankTileValue;
      }
+     this.nameOfTileWithin = highlightedTile.name;
      root.addToTileCellList(highlightedTile.id, this);
      root.addToRecentlyPlacedTiles(highlightedTile.id);
      root.removeTile(highlightedTile.id);
@@ -49,11 +51,21 @@ const Cell = React.createClass({
      root.setState({players: root.players, highlightedTile: null});  
     }
    },
-   setContents(src) {
-     this.setState({occupant: <img src={src} />});   
+   setContents(tile) {
+     const { root } = this.props;
+     if (tile.src.indexOf("blank") >= 0) {
+       tile.name = root.blankTileValue;  
+     }
+     this.nameOfTileWithin = tile.name;
+     root.addToTileCellList(tile.id, this);
+     root.addToRecentlyPlacedTiles(tile.id);
+     root.removeTile(tile.id);
+     this.setState({occupant: <img src={tile.src} />});
+     root.setState({players: root.players, highlightedTile: null});
    },
    removeContents() {
-     this.setState({occupant: null});  
+     this.setState({occupant: null});
+     this.nameOfTileWithin = "";
    },
    render() {
        let { connectDropTarget } = this.props;

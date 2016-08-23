@@ -1,11 +1,14 @@
 import React from "react";
 import TileBag from "./tilebag";
-import Player from "./player";
+import AiPlayer from "./AiPlayer";
+import HumanPlayer from "./HumanPlayer";
 import PlayerHand from "./playerhand";
 import ScoreBoard from "./scoreboard";
 import Controls from "./controls";
 import Board from "./board";
-import ExchangeDialog from "./exchangedialog"
+import ExchangeDialog from "./exchangedialog";
+import findBoardSolution from "./scrabble_solver";
+import { Directions } from "./constants";
 import HTML5Backend from "react-dnd-html5-backend";
 import { DragDropContext } from "react-dnd";
 import words from "an-array-of-english-words";
@@ -37,12 +40,6 @@ const CellState = {
   EMPTY: "",
   NONEXISTENT: null
 };
-const Direction = {
-  LEFT: "left",
-  RIGHT: "right",
-  UP: "up",
-  DOWN: "down"
-};
 const DOUBLEWORDCLASS = "double-word";
 const TRIPLEWORDCLASS = "triple-word";
 const DOUBLELETTERCLASS = "double-letter";
@@ -51,13 +48,22 @@ const FREECLASS = "free";
 
 const Root = React.createClass({
     getDefaultProps() {
-      return {numberOfPlayers: 2};
+      return {
+        humanPlayerCount: 2, 
+        aiPlayerCount: 0
+      };
     },
     getInitialState() {
       return {isExchangeDialogOpen: false, highlightedTile: null};
     },
     propTypes: {
-      numberOfPlayers: React.PropTypes.number.isRequired
+      humanPlayerCount: React.PropTypes.number.isRequired,
+      aiPlayerCount: React.PropTypes.number.isRequired
+    },
+    componentDidMount() {
+      if (this.currentTurnPlayer instanceof AiPlayer) {
+        this.makeAiMove();
+      }
     },
     componentWillMount() {
       this.bag = new TileBag();
@@ -95,11 +101,12 @@ const Root = React.createClass({
     },
     pass() {
       if (this.recentlyPlacedTiles.length === 0) {
+        this.consecutiveScorelessTurnsCount++;
+        this.gameTerminationCheck();
+        this.removeTileHighlightEffect();
         this.shiftCurrentTurnPlayer();
       }
-      this.consecutiveScorelessTurnsCount++;
-      this.gameTerminationCheck();
-      this.removeTileHighlightEffect();
+      
     },
     undo() {
       if (this.recentlyPlacedTiles.length >= 1) {
@@ -178,7 +185,7 @@ const Root = React.createClass({
       let listOfListsContainingWordFormingTiles = [];
       for (const cell of newestCells) {
          let leftmostWordsTiles = [];
-         let furthestConnectedLeftCell = this.getFurthestConnectedCellInGivenDirection(cell.props.row, cell.props.col, Direction.LEFT);
+         let furthestConnectedLeftCell = this.getFurthestConnectedCellInGivenDirection(cell.props.row, cell.props.col, Directions.LEFT);
          
          while(true) {
            if (furthestConnectedLeftCell) {
@@ -190,7 +197,7 @@ const Root = React.createClass({
            }
          }
          let northmostWordsTiles = [];
-         let furthestConnectedAboveCell = this.getFurthestConnectedCellInGivenDirection(cell.props.row, cell.props.col, Direction.UP);
+         let furthestConnectedAboveCell = this.getFurthestConnectedCellInGivenDirection(cell.props.row, cell.props.col, Directions.UP);
          while(true) {
            if (furthestConnectedAboveCell) {
             northmostWordsTiles.push(this.getTileFromTileCellList(furthestConnectedAboveCell));
@@ -277,14 +284,14 @@ const Root = React.createClass({
     areFormedWordsLegal(wordList) {
       return wordList.every((word) => this.legalWordList.indexOf(word) >= 0 );
     },
-    getFurthestConnectedCellInGivenDirection(row, col, direction) {
-        if (direction === Direction.UP || direction === Direction.DOWN) {
-            direction = (direction === Direction.UP ? "above" : "below");
+    getFurthestConnectedCellInGivenDirection(row, col, currentDirection) {
+        if (currentDirection === Directions.UP || currentDirection === Directions.DOWN) {
+            currentDirection = (currentDirection === Directions.UP ? "above" : "below");
         }
         let furthestCellInDirection = this.cellRefs[row][col];
         while(true) {
           let adjacentCells = this.getAdjacentCellContents(furthestCellInDirection.props.row, furthestCellInDirection.props.col);
-          let cellContents = adjacentCells[direction];
+          let cellContents = adjacentCells[currentDirection];
           if (cellContents) {
             furthestCellInDirection = cellContents;
           }
@@ -328,17 +335,50 @@ const Root = React.createClass({
       this.setState({players: this.players});
     },
     addPlayers() {
-      for (var i = 0; i < 4; i++) {
-        if (i < this.props.numberOfPlayers) {
-          this.players.push(new Player());
-        }
-        else {
-          this.players.push(new Player({status: "inactive"}));
-        }
+      const { humanPlayerCount, aiPlayerCount } = this.props;
+      const activePlayerCount = humanPlayerCount + aiPlayerCount;
+      const inactivePlayerCount = 4 - activePlayerCount;
+      
+      for (let i = 0; i < humanPlayerCount; i++) {
+        this.players.push(new HumanPlayer());
+      }
+      for (let j = 0; j < aiPlayerCount; j++) {
+        this.players.push(new AiPlayer());
+      }
+      for (let k = 0; k < inactivePlayerCount; k++) {
+        this.players.push(new AiPlayer());
       }
     },
     setPlayerToGoFirst() {
-      this.currentTurnPlayer = this.players[Math.floor(Math.random() * this.props.numberOfPlayers)]; 
+      const { humanPlayerCount, aiPlayerCount } = this.props;
+      const activePlayerCount = humanPlayerCount + aiPlayerCount;
+      this.currentTurnPlayer = this.players[Math.floor(Math.random() * activePlayerCount)];
+    },
+    makeAiMove() {
+      const cellContents = this.cellRefs.map((cellRow) => {
+        return cellRow.map((cell) => {
+          const isOccupied = (cell.state.occupant ? true : false);
+          if (!isOccupied) {
+            return "";
+          }
+          return cell.nameOfTileWithin; 
+        });
+      });
+      const tileDestinations = findBoardSolution(cellContents, this.currentTurnPlayer.getHand());
+      if (tileDestinations) {
+        tileDestinations.forEach((destination) => {
+          const cell = this.cellRefs[destination.row][destination.col];
+          const correspondingTile = this.currentTurnPlayer.getHand().find((tile) => tile.id === destination.id);
+          this.setState({highlightedTile: correspondingTile}, () => cell.handleClick());
+          cell.setContents(correspondingTile);
+        });
+      }
+      else if (this.bag.getTiles().length >= 7) {
+        this.exchangeTiles(this.currentTurnPlayer.getHand().map((tile) => tile.id));
+      }
+      else {
+        this.pass();
+      }
     },
     replenishCurrentTurnPlayerHand() {
       this.currentTurnPlayer.drawToLimit(this.bag);
@@ -367,8 +407,13 @@ const Root = React.createClass({
       return adjacentCells;
     },
     shiftCurrentTurnPlayer() {
+      const { humanPlayerCount, aiPlayerCount } = this.props;
+      const activePlayerCount = humanPlayerCount + aiPlayerCount;
       let currentPlayerIndex = this.state.players.findIndex((x) => x === this.currentTurnPlayer);
-      this.currentTurnPlayer = this.state.players[(currentPlayerIndex + 1) % this.props.numberOfPlayers];
+      this.currentTurnPlayer = this.state.players[(currentPlayerIndex + 1) % activePlayerCount];
+      if (this.currentTurnPlayer instanceof AiPlayer) {
+        this.makeAiMove();
+      }
     },
     dealInitialHands() {
       for (let p of this.players) {
