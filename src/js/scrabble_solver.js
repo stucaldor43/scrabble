@@ -266,7 +266,12 @@ function findBoardSolution(boardCells, tiles) {
                     
                     
                     const freeSpaces = findFreeSpaceCount(listOfIndicesOfTilesInDirection, boardCells);
-                    const lettersFromHand = tiles.map((tile) => tile.name.toLowerCase()).join("");
+                    const lettersFromHand = tiles.map((tile) => {
+                        if (tile.name.includes("blank")) {
+                            return "";
+                        }
+                        return tile.name.toLowerCase();
+                    }).join("");
                     const params = {
                         direction: currentDirection,
                         initialCellContents: boardCells[rowIndex][colIndex],
@@ -300,7 +305,12 @@ function findBoardSolution(boardCells, tiles) {
         }
     }
     if (isBoardEmpty(boardCells)) {
-        const lettersFromHand = tiles.map((tile) => tile.name.toLowerCase()).join("");
+        const lettersFromHand = tiles.map((tile) => {
+            if (tile.name.includes("blank")) {
+                return "";
+            }
+            return tile.name.toLowerCase();
+        }).join("");
         const words = getWordsContainingOnlyLettersAvailableToPlayer(lettersFromHand, tiles.length);
         const makeableWords = words.filter((w) => canWordBeCreatedUsingAvailableLetters(w, lettersFromHand));
         const randomlySelectedWord = makeableWords[Math.floor(Math.random() * makeableWords.length)];
