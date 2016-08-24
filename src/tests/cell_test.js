@@ -1,7 +1,7 @@
 import React from "react";
 import jsdom from "jsdom";
 import { assert } from "chai";
-import { shallow } from "enzyme";
+import { shallow, mount } from "enzyme";
 import Cell from "../js/cell";
 import GameTemp from "../js/gametemp";
 
@@ -22,11 +22,12 @@ function propagateToGlobal (window) {
   }
 }
 
-const CellComponent = Cell.DecoratedComponent;
-const GameComponent = GameTemp.DecoratedComponent;
-
 describe("<Cell />", () => {
     let wrapper;
+    let props;
+    
+    const CellComponent = Cell.DecoratedComponent;
+    const GameComponent = GameTemp.DecoratedComponent;
     
     const tile = {
       name: "y",
@@ -35,15 +36,14 @@ describe("<Cell />", () => {
       frequency: 2
     };
     
-    const props = {
-        root: <GameComponent />,
-        row: 0,
-        col: 0,
-        classAttrName: "square",
-        identity: (c) => c
-    };
-    
     beforeEach(() => {
+        props = {
+            root: shallow(<GameComponent />).instance(),
+            row: 0,
+            col: 0,
+            classAttrName: "square",
+            identity: (c) => c
+        };
         wrapper = shallow(<CellComponent root={props.root}
         row={props.row} col={props.col} 
         classAttrName={props.classAttrName}
@@ -61,7 +61,7 @@ describe("<Cell />", () => {
     it("can have contents removed", () => {
         const instance = wrapper.instance();
         
-        instance.setContents(tile.src);
+        instance.setContents(tile);
         wrapper.update();
         const wrapperImageCount = wrapper.find("img").length;
         assert.strictEqual(wrapperImageCount, 1);
@@ -81,7 +81,7 @@ describe("<Cell />", () => {
        const initialWrapperImageCount = wrapper.find("img").length;
        assert.strictEqual(initialWrapperImageCount, 0);
        
-       wrapper.instance().setContents(tile.src);
+       wrapper.instance().setContents(tile);
        wrapper.update();
        const currentWrapperImageCount = wrapper.find("img").length;
        assert.strictEqual(currentWrapperImageCount, 1);
