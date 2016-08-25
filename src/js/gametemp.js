@@ -369,9 +369,13 @@ const Root = React.createClass({
         tileDestinations.forEach((destination) => {
           const cell = this.cellRefs[destination.row][destination.col];
           const correspondingTile = this.currentTurnPlayer.getHand().find((tile) => tile.id === destination.id);
-          this.setState({highlightedTile: correspondingTile}, () => cell.handleClick());
-          cell.setContents(correspondingTile);
+          this.setState({highlightedTile: correspondingTile}, () => {
+            cell.setContents(correspondingTile);
+            
+          });
+          
         });
+        setTimeout(() => this.endTurn(), 600);
       }
       else if (this.bag.getTiles().length >= 7) {
         this.exchangeTiles(this.currentTurnPlayer.getHand().map((tile) => tile.id));
