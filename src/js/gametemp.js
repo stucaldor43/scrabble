@@ -415,7 +415,7 @@ const Root = React.createClass({
       const activePlayerCount = humanPlayerCount + aiPlayerCount;
       let currentPlayerIndex = this.state.players.findIndex((x) => x === this.currentTurnPlayer);
       this.currentTurnPlayer = this.state.players[(currentPlayerIndex + 1) % activePlayerCount];
-      if (this.currentTurnPlayer instanceof AiPlayer) {
+      if (this.currentTurnPlayer instanceof AiPlayer && !this.isGameOver()) {
         this.makeAiMove();
       }
     },
