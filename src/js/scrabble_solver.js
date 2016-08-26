@@ -161,14 +161,46 @@ function canWordBeCreatedUsingAvailableLetters(word, availableLetters) {
 
 function getWordsStartingWithLetter(fixedLetter, optionalLetters, maxWordLength) {
     const regex = new RegExp(`^${fixedLetter}[${optionalLetters}]+$`, 'g');
-    return dictionary.filter((w) => {
+    let words;
+    
+    if (!cache.get(fixedLetter)) {
+        const wordsStartingWithLetter = dictionary.filter((word) => {
+            return word.charAt(0).toLowerCase() === fixedLetter.toLowerCase();
+        });
+        const wordsEndingWithLetter = dictionary.filter((word) => {
+            return word.charAt(word.length - 1).toLowerCase() === fixedLetter.toLowerCase();
+        });
+        cache.add(fixedLetter, {
+           wordsStartingWithKey: wordsStartingWithLetter,
+           wordsEndingWithKey: wordsEndingWithLetter
+        });
+    }
+    words = cache.get(fixedLetter).wordsStartingWithKey;
+    
+    return words.filter((w) => {
         return w.match(regex) && w.length <= maxWordLength;
     });     
 }
 
 function getWordsEndingWithLetter(fixedLetter, optionalLetters, maxWordLength) {
     const regex = new RegExp(`^[${optionalLetters}]+${fixedLetter}$`, 'g');
-    return dictionary.filter((w) => {
+    let words;
+    
+    if (!cache.get(fixedLetter)) {
+        const wordsStartingWithLetter = dictionary.filter((word) => {
+            return word.charAt(0).toLowerCase() === fixedLetter.toLowerCase();
+        });
+        const wordsEndingWithLetter = dictionary.filter((word) => {
+            return word.charAt(word.length - 1).toLowerCase() === fixedLetter.toLowerCase();
+        });
+        cache.add(fixedLetter, {
+           wordsStartingWithKey: wordsStartingWithLetter,
+           wordsEndingWithKey: wordsEndingWithLetter
+        });
+    }
+    words = cache.get(fixedLetter).wordsEndingWithKey;
+    
+    return words.filter((w) => {
         return w.match(regex) && w.length <= maxWordLength;
     });  
 }
