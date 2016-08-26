@@ -1,6 +1,24 @@
 import { Directions, Status } from "./constants"
 import dictionary from "an-array-of-english-words";
 
+const cache = (function() {
+    const items = {};
+    
+    return {
+        get(key) {
+            if (typeof items[key] === "undefined") {
+                return undefined;
+            }
+            return items[key];
+        },
+        add(key, value) {
+            if (typeof items[key] === "undefined") {
+                items[key] = value;
+            }   
+        }
+    };
+})();
+
 function getAdjacentCells(row, col, boardCells) {
     const rowLimit = boardCells.length;
     const colLimit = boardCells[0].length;
