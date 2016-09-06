@@ -37,6 +37,4 @@ describe("<PlayerTile />", () => {
         const numberOfClickedTiles = wrapper.find(".active .current-selection").length;
         assert.strictEqual(numberOfClickedTiles, 1);
     });
-    
-    
 });

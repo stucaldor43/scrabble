@@ -1,7 +1,7 @@
 import React from "react";
 import jsdom from "jsdom";
 import { assert } from "chai";
-import { shallow } from "enzyme";
+import { shallow, mount } from "enzyme";
 import Controls from "../js/controls";
 import GameTemp from "../js/gametemp";
 
@@ -24,14 +24,18 @@ function propagateToGlobal (window) {
 
 describe("<Controls />", () => {
     const GameComponent = GameTemp.DecoratedComponent;
-    let wrapper;
+    let shallowWrapper;
+    let mountedWrapper;
+    let instance;
     
     beforeEach(() => {
-        wrapper = shallow(<Controls parent={<GameComponent />} />); 
+        shallowWrapper = shallow(<Controls parent={<GameComponent />} />);
+        mountedWrapper = mount(<GameTemp />);
+        instance = mountedWrapper.get(0).getDecoratedComponentInstance();
     });
     
     it("should render buttons", () => {
-        const buttonWrapper = wrapper.find("button");
+        const buttonWrapper = shallowWrapper.find("button");
         let buttonTexts = [];
         buttonWrapper.forEach((node) => {
             buttonTexts.push(node.text());
@@ -47,10 +51,58 @@ describe("<Controls />", () => {
     });
     
     it("should render a select box with 26 options", () => {
-        const numberOfSelectElements = wrapper.find("select").length;
+        const numberOfSelectElements = shallowWrapper.find("select").length;
         assert.equal(numberOfSelectElements, 1);
         
-        const numberOfOptionElements = wrapper.find("option").length;
+        const numberOfOptionElements = shallowWrapper.find("option").length;
         assert.equal(numberOfOptionElements, 26); 
+    });
+    
+    it("should have button for passing", (done) => {
+        const initialCurrentTurnPlayer = instance.currentTurnPlayer;
+        mountedWrapper.find("#pass").simulate("click");
+        const postPassCurrentTurnPlayer = instance.currentTurnPlayer;
+        assert.notEqual(postPassCurrentTurnPlayer, initialCurrentTurnPlayer);
+        done();
+    });
+    
+    it("should have button for ending turn", (done) => {
+        const initialCurrentTurnPlayer = instance.currentTurnPlayer;
+        mountedWrapper.find("#end").simulate("click");
+        const postEndTurnCurrentTurnPlayer = instance.currentTurnPlayer;
+        assert.notEqual(postEndTurnCurrentTurnPlayer, initialCurrentTurnPlayer);
+        done();
+    });
+    
+    it("should have button for undoing last tile placement", (done) => {
+        const numberOfOccupiedCells = mountedWrapper.find(".square img").length;
+        assert.strictEqual(numberOfOccupiedCells, 0);
+        
+        const playerTileWrapper = mountedWrapper.find(".active img");
+        playerTileWrapper.at(0).simulate("click");
+        mountedWrapper.find(".empty").at(0).simulate("click");
+        let updatedNumberOfOccupiedCells = mountedWrapper.find(".square img").length;
+        assert.strictEqual(updatedNumberOfOccupiedCells, 1);
+        
+        mountedWrapper.find("#undo").simulate("click");
+        updatedNumberOfOccupiedCells = mountedWrapper.find(".square img").length;
+        assert.strictEqual(updatedNumberOfOccupiedCells, 0);
+        done();
+    });
+    
+    it("should have button that allows tiles to be exchanged", (done) => {
+        const currentPlayersTiles = instance.currentTurnPlayer.getHand();
+        mountedWrapper.find("#exchange").simulate("click");
+        const dialogWrapper = mountedWrapper.find(".dialog");
+        dialogWrapper.find("img").forEach((node) => {
+          node.simulate("click");
+        });
+        dialogWrapper.find("#dialog-submit").simulate("click");
+        const newTiles = instance.currentTurnPlayer.getHand();
+        const tilesAreInSameOrder = newTiles.every((tile, i) => {
+          return tile === currentPlayersTiles[i];   
+        });
+        assert.isFalse(tilesAreInSameOrder);
+        done();
     });
 });
