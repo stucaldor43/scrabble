@@ -109,7 +109,6 @@ describe("findBoardSolution()", () => {
         const areAllDestinationsInSameColumn = destinationColumns.every(function(columnNumber, i, arr) {
             return columnNumber === arr[0];
         });
-        
         assert.isTrue(areAllDestinationsInSameColumn || areAllDestinationsInSameRow);
         
         const boardAfterSolutionTilesArePlaced = cells.map((currRow, rowIndex, arr) => {
@@ -131,7 +130,6 @@ describe("findBoardSolution()", () => {
         const allFormedWordsAreLegal = wordsFormedByNewTiles.every((word) => {
             return validWords.indexOf(word.toLowerCase()) >= 0;
         });
-        
         assert.isTrue(allFormedWordsAreLegal);
         
         const wordFrequencies = wordsFormedByNewTiles.reduce((prev, word, i, arr) => {
@@ -153,14 +151,12 @@ describe("findBoardSolution()", () => {
                                            sort(ascendingOrderSort).join("");
         const atLeastOneWordContainsAllTilesFromSolution = wordsWhichAppearAsManyTimesAsThereAreNewTiles.some((word) => {
             const sortedLettersOfWord = word.split("").sort(ascendingOrderSort).join("");
-            console.log(sortedLettersOfWord + " compared to " + sortedLettersPlacedOnBoard);
             const wordsHaveMatchingLetterFrequencies = sortedLettersPlacedOnBoard.split("").every((letter) => {
                 return findFrequency(letter, sortedLettersPlacedOnBoard.split("")) === 
                 findFrequency(letter, sortedLettersOfWord);
             });
             return wordsHaveMatchingLetterFrequencies;
         });
-        
         assert.isTrue(atLeastOneWordContainsAllTilesFromSolution);
     });
     

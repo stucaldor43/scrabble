@@ -1,7 +1,7 @@
 import React from "react";
 import jsdom from "jsdom";
 import { assert } from "chai";
-import { shallow, mount } from "enzyme";
+import { shallow } from "enzyme";
 import Cell from "../js/cell";
 import GameTemp from "../js/gametemp";
 
@@ -50,7 +50,7 @@ describe("<Cell />", () => {
         connectDropTarget={props.identity} />);    
     });
     
-    it("renders Cell", () => {
+    it("should render Cell", () => {
         const wrapperHasClass = wrapper.hasClass(props.classAttrName); 
         assert.isTrue(wrapperHasClass);
         
@@ -58,9 +58,8 @@ describe("<Cell />", () => {
         assert.strictEqual(type, "div");
     });
     
-    it("can have contents removed", () => {
+    it("should be able to have contents set or removed", () => {
         const instance = wrapper.instance();
-        
         instance.setContents(tile);
         wrapper.update();
         const wrapperImageCount = wrapper.find("img").length;
@@ -72,12 +71,12 @@ describe("<Cell />", () => {
         assert.strictEqual(newWrapperImageCount, 0);
     });
     
-    it("does not show an image when unoccupied", () => {
+    it("should not render an image when unoccupied", () => {
         const wrapperImageCount = wrapper.find("img").length;
         assert.strictEqual(wrapperImageCount, 0);    
     });
     
-    it("shows an image when occupied", () => {
+    it("should render an image when occupied", () => {
        const initialWrapperImageCount = wrapper.find("img").length;
        assert.strictEqual(initialWrapperImageCount, 0);
        
@@ -87,4 +86,3 @@ describe("<Cell />", () => {
        assert.strictEqual(currentWrapperImageCount, 1);
     });
 });
-

@@ -26,6 +26,7 @@ describe("<GameTemp />", () => {
     let spy;
     let wrapper;
     let instance;
+    const numberOfConsecutiveUnscoredTurnsUntilGameEnds = 6;
     
     beforeEach(() => {
       wrapper = mount(<GameTemp />);
@@ -47,7 +48,6 @@ describe("<GameTemp />", () => {
       const initialCurrentTurnPlayer = instance.currentTurnPlayer;
       wrapper.find("#pass").simulate("click");
       const postPassCurrentTurnPlayer = instance.currentTurnPlayer;
-      
       assert.notEqual(postPassCurrentTurnPlayer, initialCurrentTurnPlayer);
       done();
     });
@@ -55,9 +55,8 @@ describe("<GameTemp />", () => {
     it("should have button for ending turn", (done) => {
       const initialCurrentTurnPlayer = instance.currentTurnPlayer;
       wrapper.find("#end").simulate("click");
-      const postPassCurrentTurnPlayer = instance.currentTurnPlayer;
-      
-      assert.notEqual(postPassCurrentTurnPlayer, initialCurrentTurnPlayer);
+      const postEndTurnCurrentTurnPlayer = instance.currentTurnPlayer;
+      assert.notEqual(postEndTurnCurrentTurnPlayer, initialCurrentTurnPlayer);
       done();
     });
     
@@ -73,21 +72,21 @@ describe("<GameTemp />", () => {
       const tilesAreInSameOrder = newTiles.every((tile, i) => {
         return tile === currentPlayersTiles[i];   
       });
-      
       assert.isFalse(tilesAreInSameOrder);
       done();
     });
     
     it("should allow user to click to move tiles", (done) => {
-      const activePlayersHandWrapper = wrapper.find(".active");
-      assert.equal(wrapper.find(".square img").length, 0);
+      const numberOfTilesOnBoard = wrapper.find(".square img").length;
+      assert.equal(numberOfTilesOnBoard, 0);
       
+      const activePlayersHandWrapper = wrapper.find(".active");
       const playerTilesWrapper = activePlayersHandWrapper.find("img");
       playerTilesWrapper.at(0).simulate("click");
       const emptyCellsWrapper = wrapper.find(".empty");
       emptyCellsWrapper.at(0).simulate("click");
-      
-      assert.equal(wrapper.find(".square img").length, 1);
+      const updatedNumberOfTilesOnBoard = wrapper.find(".square img").length;
+      assert.equal(updatedNumberOfTilesOnBoard, 1);
       done();
     });
     
@@ -95,9 +94,9 @@ describe("<GameTemp />", () => {
       assert.isFalse(instance.isGameOver());
       const endTurnButton = wrapper.find("#end");
       
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < numberOfConsecutiveUnscoredTurnsUntilGameEnds; i++) {
         endTurnButton.simulate("click");
-        if (i < 5) {
+        if (i < (numberOfConsecutiveUnscoredTurnsUntilGameEnds - 1)) {
           assert.isFalse(instance.isGameOver());
         }
       }
@@ -110,23 +109,22 @@ describe("<GameTemp />", () => {
       const expectedScores = [];
       
       for (const p of instance.players) {
-        const sum = p.getHand().reduce((prev, tile) => {
+        const playerTileSum = p.getHand().reduce((prev, tile) => {
           prev += tile.value;
           return prev;
         }, 0);
-        expectedScores.push(0 - sum);
+        const expectedScore = 0 - playerTileSum;
+        expectedScores.push(expectedScore);
       }
       
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < numberOfConsecutiveUnscoredTurnsUntilGameEnds; i++) {
         wrapper.find("#end").simulate("click");
       }
       
-      instance.players.forEach((player, i) => {
-        assert.equal(player.score, expectedScores[i]);
+      const allPlayersHaveExpectedScores = instance.players.every((player, i) => {
+        return player.score === expectedScores[i];
       });
+      assert.isTrue(allPlayersHaveExpectedScores);
       done();
     });
 });
-
-
-

@@ -29,16 +29,14 @@ describe("<PlayerTile />", () => {
     });
     
     it("should only be highlighted when selected by player", () => {
-        let selectedTileWrapper = wrapper.find(".active .current-selection");
-        assert.strictEqual(selectedTileWrapper.length, 0);
+        const numberOfHighlightedTiles = wrapper.find(".active .current-selection").length;
+        assert.strictEqual(numberOfHighlightedTiles, 0);
+        
         const playerTileWrapper = wrapper.find(".active img");
         playerTileWrapper.at(0).simulate("click");
-        selectedTileWrapper = wrapper.find(".active .current-selection");
-        assert.strictEqual(selectedTileWrapper.length, 1);
+        const numberOfClickedTiles = wrapper.find(".active .current-selection").length;
+        assert.strictEqual(numberOfClickedTiles, 1);
     });
     
     
 });
-
-
-

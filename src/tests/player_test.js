@@ -22,7 +22,6 @@ describe("Player", () => {
       it("draws cards until limit is reached", () => {
         player.drawToLimit(bag);
         let handContents = player.getHand();
-      
         assert.strictEqual(handContents.length, 7);
       });  
     });
@@ -71,8 +70,8 @@ describe("Player", () => {
         const newHand = [tile];
         player.setHand(newHand);
         const result = player.getTile(tile.id);
-        assert.isObject(result);
         assert.isNotNull(result);
+        assert.isObject(result);
       });  
     });
     
@@ -80,12 +79,12 @@ describe("Player", () => {
       it("removes tile from hand", () => {
         const newHand = [tile];
         player.setHand(newHand);
-        const initialTileCount = player.getHand().length; 
-        assert.strictEqual(initialTileCount, 1);
+        const numberOfTilesInHand = player.getHand().length; 
+        assert.strictEqual(numberOfTilesInHand, 1);
         
         player.removeTile(tile.id);
-        const postRemovalTileCount = player.getHand().length;
-        assert.strictEqual(postRemovalTileCount, 0);
+        const updatedNumberOfTilesInHand = player.getHand().length;
+        assert.strictEqual(updatedNumberOfTilesInHand, 0);
       });  
     });
     
@@ -99,4 +98,3 @@ describe("Player", () => {
     });
     
 });
-

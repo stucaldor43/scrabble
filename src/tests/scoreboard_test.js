@@ -23,15 +23,16 @@ function propagateToGlobal (window) {
 
 describe("<ScoreBoard />", () => {
   let props;
+  let wrapper;
   
   beforeEach(() => {
     props = {
       scores: [0, 0, 0, 0]
     };
+    wrapper = shallow(<ScoreBoard scores={props.scores} />);
   });
   
-  it("renders four input elements", () => {
-    const wrapper = shallow(<ScoreBoard scores={props.scores} />);
+  it("should render four input elements", () => {
     const inputWrapper = wrapper.find("input");
     assert.strictEqual(inputWrapper.length, 4);
     inputWrapper.forEach((node) => {
@@ -39,10 +40,8 @@ describe("<ScoreBoard />", () => {
     });
   });
   
-  it("renders four labels", () => {
-    const wrapper = shallow(<ScoreBoard scores={props.scores} />);
-    const labelWrapper = wrapper.find(".score-holder label");
-    assert.strictEqual(labelWrapper.length, 4);
+  it("should render four labels", () => {
+    const numberOfLabels = wrapper.find(".score-holder label").length;
+    assert.strictEqual(numberOfLabels, 4);
   });
 });
-

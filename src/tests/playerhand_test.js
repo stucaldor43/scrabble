@@ -22,15 +22,12 @@ function propagateToGlobal (window) {
 }
 
 describe("<PlayerHand />", () => {
-    it("renders tiles", () => {
+    it("should render tiles", () => {
         const wrapper = mount(<GameTemp />);
         const handWrapper = wrapper.find("PlayerHand");
-        handWrapper.forEach((node) => {
-            const playerTileCount = node.find("PlayerTile").length; 
-            assert.strictEqual(playerTileCount, 7);
+        handWrapper.forEach((hand) => {
+            const numberOfTilesInHand = hand.find("PlayerTile").length; 
+            assert.strictEqual(numberOfTilesInHand, 7);
         });
     });
 });
-
-
-

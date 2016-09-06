@@ -30,27 +30,27 @@ describe("<Controls />", () => {
         wrapper = shallow(<Controls parent={<GameComponent />} />); 
     });
     
-    it("renders buttons", () => {
+    it("should render buttons", () => {
         const buttonWrapper = wrapper.find("button");
-        let buttonTextList = [];
+        let buttonTexts = [];
         buttonWrapper.forEach((node) => {
-            buttonTextList.push(node.text());
+            buttonTexts.push(node.text());
             assert.equal(node.type(), "button");
         });
         const correctText = ["pass", "undo", "exchange", "end turn"];
-        assert.isTrue(correctText.every((expectedText) => {
-            return buttonTextList.map((btnText) => {
+        const allButtonsHaveExpectedText = correctText.every((expectedText) => {
+            return buttonTexts.map((btnText) => {
                 return btnText.toLowerCase();
             }).indexOf(expectedText) >= 0;
-        }));
+        });
+        assert.isTrue(allButtonsHaveExpectedText);
     });
     
-    it("renders select box with 26 options", () => {
-        const wrapperSelectCount = wrapper.find("select").length;
-        assert.equal(wrapperSelectCount, 1);
+    it("should render a select box with 26 options", () => {
+        const numberOfSelectElements = wrapper.find("select").length;
+        assert.equal(numberOfSelectElements, 1);
         
-        const wrapperOptionCount = wrapper.find("option").length;
-        assert.equal(wrapperOptionCount, 26); 
+        const numberOfOptionElements = wrapper.find("option").length;
+        assert.equal(numberOfOptionElements, 26); 
     });
 });
-

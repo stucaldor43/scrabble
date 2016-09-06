@@ -5,22 +5,14 @@ import { shallow } from "enzyme";
 import ExchangeDialog from "../js/exchangedialog";
 import GameTemp from "../js/gametemp";
 
-// setup the simplest document possible
-var doc = jsdom.jsdom('<!doctype html><html><body></body></html>')
+var doc = jsdom.jsdom('<!doctype html><html><body></body></html>');
+var win = doc.defaultView;
 
-// get the window object out of the document
-var win = doc.defaultView
+global.document = doc;
+global.window = win;
 
-// set globals for mocha that make access to document and window feel 
-// natural in the test environment
-global.document = doc
-global.window = win
+propagateToGlobal(win);
 
-// take all properties of the window object and also attach it to the 
-// mocha global object
-propagateToGlobal(win)
-
-// from mocha-jsdom https://github.com/rstacruz/mocha-jsdom/blob/master/index.js#L80
 function propagateToGlobal (window) {
   for (let key in window) {
     if (!window.hasOwnProperty(key)) continue
@@ -34,7 +26,8 @@ const GameComponent = GameTemp.DecoratedComponent;
 
 describe("<ExchangeDialog />", function() {
     let props;
-
+    let wrapper;
+    
     beforeEach(function() {
         props = {
             parent: <GameComponent />,
@@ -52,35 +45,33 @@ describe("<ExchangeDialog />", function() {
                 id: 101
                 }]
         };
+        wrapper = shallow(<ExchangeDialog isOpen={true}
+        parent={props.parent} tiles={props.tiles} />);
     });
    
-    it("renders buttons when it is open", function() {
-        const wrapper = shallow(<ExchangeDialog isOpen={true}
-        parent={props.parent} tiles={props.tiles} />);
+    it("should render buttons when it is open", function() {
         const buttonWrapper = wrapper.find("button");
+        assert.equal(buttonWrapper.length, 2);
+        
         const buttonTexts = buttonWrapper.map(function(node) {
             return node.text().toLowerCase();
         });
-        const expectedWords = ["exchange chosen tiles", "cancel"];
-        
-        assert.equal(buttonWrapper.length, 2);
-        
-        const areExpectedWordsPresent = expectedWords.every(function(word) {
+        const expectedButtonTexts = ["exchange chosen tiles", "cancel"];
+        const allButtonsHaveExpectedText = expectedButtonTexts.every(function(word) {
             return buttonTexts.indexOf(word) >= 0;       
         });
-        assert.isTrue(areExpectedWordsPresent);
+        assert.isTrue(allButtonsHaveExpectedText);
     });
     
-    it("renders images for tiles", function() {
-        const wrapper = shallow(<ExchangeDialog isOpen={true}
-        parent={props.parent} tiles={props.tiles} />);
+    it("should render images for tiles", function() {
         const imageWrapper = wrapper.find("img");
-        const exchangeCandidateTileSrcs = imageWrapper.map(function(node) {
+        let playerTileSrcs = imageWrapper.map(function(node) {
             return node.get(0).props.src;
         });
         
         props.tiles.forEach(function(expectedTile) {
-            const index = exchangeCandidateTileSrcs.indexOf(expectedTile.src);
+            const index = playerTileSrcs.indexOf(expectedTile.src);
+            playerTileSrcs = playerTileSrcs.filter((tileSrc, i) => i !== index);
             assert.isAtLeast(index, 0);
         });
         assert.equal(imageWrapper.length, props.tiles.length);
